@@ -1,5 +1,4 @@
-#!/bin/sh
-":"; //# ; exec /usr/bin/env node --experimental-modules --no-warnings "$0" "$@"
+#!/usr/bin/env -S node --experimental-modules --no-warnings
 
 import { parseFormat } from "./bin/functions/parseFormat.mjs";
 import { createFolder } from "./bin/functions/createFolder.mjs";
