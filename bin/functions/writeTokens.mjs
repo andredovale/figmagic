@@ -7,11 +7,12 @@ export function writeTokens(tokens, format) {
 	if (tokens.length > 0) {
 		tokens.forEach(token => {
 			let tokenName = camelize(token.name);
-			tokenName = formatName(tokenName);
+      tokenName = formatName(tokenName);
 
-			const processedToken = processTokens(token, tokenName);
-
-			writeFile(processedToken, 'tokens', tokenName, true, format);
+      const processedToken = processTokens(token, tokenName);
+      if(processedToken) {
+        writeFile(processedToken, 'tokens', tokenName, true, format);
+      }
 		});
 	} else {
 		throw new Error('Less than one token provided to writeTokens()!');
