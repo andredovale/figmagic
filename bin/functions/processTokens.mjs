@@ -17,7 +17,7 @@ export function processTokens(sheet, name) {
 		if (_name === 'spacing' || _name === 'spacings') {
 			processedTokens = setupSpacingTokens(sheet);
 		}
-		if (_name === 'fontfamily' || _name === 'fontfamilies') {
+    if (_name === 'fontfamily' || _name === 'fontfamilies' || _name === 'fonts') {
 			processedTokens = setupFontTokens(sheet);
 		}
 		if (_name === 'fontsize' || _name === 'fontsizes') {
