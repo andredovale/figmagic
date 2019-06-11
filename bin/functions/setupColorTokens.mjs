@@ -13,8 +13,6 @@ export function setupColorTokens(frame) {
       continue;
     }
 
-    console.log(color);
-
     const colorString = `rgba(${color.fills[0].color.r * 255}, ${color.fills[0].color.g *
       255}, ${color.fills[0].color.b * 255}, ${color.fills[0].color.a * 1})`;
 
