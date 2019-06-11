@@ -7,11 +7,11 @@ import fs from 'fs';
  * @param {string} dir - The name of the directory that the user wants to create
  */
 export function createFolder(dir) {
-	if (dir) {
-		if (!fs.existsSync(dir)) {
-			fs.mkdirSync(dir);
-		}
-	} else {
+	if (!dir) {
 		throw new Error('No directory specified for createFolder()!');
-	}
+  }
+
+  if (!fs.existsSync(dir)) {
+		fs.mkdirSync(dir);
+  }
 }

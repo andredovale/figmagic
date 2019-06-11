@@ -4,17 +4,17 @@ import { processTokens } from './processTokens.mjs';
 import { writeFile } from './writeFile.mjs';
 
 export function writeTokens(tokens, format) {
-	if (tokens.length > 0) {
-		tokens.forEach(token => {
-			let tokenName = camelize(token.name);
-      tokenName = formatName(tokenName);
-
-      const processedToken = processTokens(token, tokenName);
-      if(processedToken) {
-        writeFile(processedToken, 'tokens', tokenName, true, format);
-      }
-		});
-	} else {
+	if (!tokens || tokens.length == 0) {
 		throw new Error('Less than one token provided to writeTokens()!');
+  }
+
+  for (let token of tokens) {
+		let tokenName = camelize(token.name);
+    tokenName = formatName(tokenName);
+
+    const processedToken = processTokens(token, tokenName);
+    if(processedToken) {
+      writeFile(processedToken, 'tokens', tokenName, true, format);
+    }
 	}
 }
