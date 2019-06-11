@@ -1,4 +1,4 @@
-#!/usr/bin/env -S node --experimental-modules --no-warnings
+#!/usr/bin/env -S node --experimental-modules
 
 import { parseFormat } from "./bin/functions/parseFormat.mjs";
 import { createFolder } from "./bin/functions/createFolder.mjs";
