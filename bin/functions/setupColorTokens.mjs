@@ -7,6 +7,10 @@ export function setupColorTokens(frame) {
 	}
 
 	let colors = {
+		global: {
+			type: 'color',
+			category: 'web'
+		},
 		props: {}
 	};
 
@@ -17,9 +21,7 @@ export function setupColorTokens(frame) {
 
 		let token = {
 			value: `rgba(${color.fills[0].color.r * 255}, ${color.fills[0].color.g * 255}, ${color
-				.fills[0].color.b * 255}, ${color.fills[0].color.a * 1})`,
-			type: 'color',
-			category: 'background'
+				.fills[0].color.b * 255}, ${color.fills[0].color.a * 1})`
 		};
 
 		let normalizedName = camelize(color.name);
