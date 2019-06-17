@@ -16,11 +16,8 @@ function write(file, path, name, isToken, format) {
 	let filePath = `${path}/${name}`;
 
 	if (isToken) {
-		console.log(format);
 		if (format === 'yml' || format === 'yaml') {
 			fileContent = yaml.dump(file);
-			console.log('yaml');
-			console.log(fileContent);
 		} else {
 			fileContent = `const ${name} = ${JSON.stringify(file, null, ' ')}\n\nexport default ${name};`;
 		}

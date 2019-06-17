@@ -17,5 +17,9 @@ export async function getFromApi() {
 			writeFile(JSON.stringify(json), 'figma', 'figma.json');
 		});
 
+	if (data.err) {
+		throw new Error('Figma Error: ' + data.status + ' - ' + data.err);
+	}
+
 	return data;
 }
