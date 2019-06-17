@@ -5,19 +5,29 @@ import { normalizeUnits } from './normalizeUnits.mjs';
 export function setupLineHeightTokens(frame) {
 	if (!frame) {
 		throw new Error('No frame for setupLineHeightTokens()!');
-  }
-
-  let lineHeightObject = {};
-
-  for (let lineHeight of frame.children) {
-    if (!lineHeight.name.startsWith('$')) {
-      continue;
-    }
-
-    let name = camelize(lineHeight.name);
-		name = formatName(name);
-		lineHeightObject[name] = normalizeUnits(type.style.lineHeightPercent, 'percent', 'unitless');
 	}
 
-	return lineHeightObject;
+	let lineHeights = {
+		global: {
+			type: 'lineHeight',
+			category: 'web'
+		},
+		props: {}
+	};
+
+	for (let lineHeight of frame.children) {
+		if (!lineHeight.name.startsWith('$')) {
+			continue;
+		}
+
+		let token = {
+			value: normalizeUnits(lineHeight.style.lineHeightPercent, 'percent', 'unitless')
+		};
+
+		let name = camelize(lineHeight.name);
+		name = formatName(name);
+		lineHeights.props[name] = token;
+	}
+
+	return lineHeights;
 }

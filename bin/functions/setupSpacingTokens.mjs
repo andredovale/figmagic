@@ -5,18 +5,29 @@ import { normalizeUnits } from './normalizeUnits.mjs';
 export function setupSpacingTokens(frame) {
 	if (!frame) {
 		throw new Error('No frame for setupSpacingTokens()!');
-  }
-
-	const spacingObject = {};
-
-  for (let spacing of frame.children) {
-    if (!spacing.name.startsWith('$')) {
-      continue;
-    }
-		let normalizedName = camelize(spacing.name);
-		normalizedName = formatName(normalizedName);
-		spacingObject[normalizedName] = normalizeUnits(spacing.absoluteBoundingBox.width, 'px', 'em');
 	}
 
-	return spacingObject;
+	let spacings = {
+		global: {
+			type: 'lineHeight',
+			category: 'web'
+		},
+		props: {}
+	};
+
+	for (let spacing of frame.children) {
+		if (!spacing.name.startsWith('$')) {
+			continue;
+		}
+
+		let token = {
+			value: normalizeUnits(spacing.absoluteBoundingBox.width, 'px', 'em')
+		};
+
+		let name = camelize(spacing.name);
+		name = formatName(name);
+		spacings.props[name] = token;
+	}
+
+	return spacings;
 }

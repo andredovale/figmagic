@@ -24,9 +24,9 @@ export function setupColorTokens(frame) {
 				.fills[0].color.b * 255}, ${color.fills[0].color.a * 1})`
 		};
 
-		let normalizedName = camelize(color.name);
-		normalizedName = formatName(normalizedName);
-		colors.props[normalizedName] = token;
+		let name = camelize(color.name);
+		name = formatName(name);
+		colors.props[name] = token;
 	}
 
 	return colors;
