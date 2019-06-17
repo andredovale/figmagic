@@ -8,9 +8,7 @@
 export function parseFormat(value) {
 	if (value === undefined) {
 		return 'mjs';
-  }
-	if (value.toLowerCase() === 'mjs' || value.toLowerCase() === 'js') {
-		return value.toLowerCase();
-  }
-  return 'mjs';
+	}
+
+	return value.toLowerCase();
 }

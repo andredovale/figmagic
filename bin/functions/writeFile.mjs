@@ -1,10 +1,11 @@
 import fs from 'fs';
+import yaml from 'js-yaml';
 import { createFolder } from './createFolder.mjs';
 
 export function writeFile(file, path, name, isToken = false, format) {
 	if (!file || !path || !name) {
 		throw new Error('Missing required parameters to correctly run writeFile()!');
-  }
+	}
 
 	createFolder(path);
 	write(file, path, name, isToken, format);
@@ -15,7 +16,14 @@ function write(file, path, name, isToken, format) {
 	let filePath = `${path}/${name}`;
 
 	if (isToken) {
-		fileContent = `const ${name} = ${JSON.stringify(file, null, ' ')}\n\nexport default ${name};`;
+		console.log(format);
+		if (format === 'yml' || format === 'yaml') {
+			fileContent = yaml.dump(file);
+			console.log('yaml');
+			console.log(fileContent);
+		} else {
+			fileContent = `const ${name} = ${JSON.stringify(file, null, ' ')}\n\nexport default ${name};`;
+		}
 		filePath += `.${format}`;
 	}
 
