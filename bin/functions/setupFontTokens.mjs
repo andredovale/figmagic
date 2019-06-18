@@ -20,7 +20,7 @@ export function setupFontTokens(frame) {
 		}
 
 		let token = {
-			value: font.style.fontPostScriptName
+			value: font.characters
 		};
 
 		let name = camelize(font.name);
