@@ -1,5 +1,6 @@
 import { camelize } from './camelize.mjs';
 import { formatName } from './formatName.mjs';
+import { roundToDecimal } from './roundToDecimal.mjs';
 
 export function setupColorTokens(frame) {
 	if (!frame) {
@@ -19,9 +20,13 @@ export function setupColorTokens(frame) {
 			continue;
 		}
 
+		const colorR = Math.round(color.fills[0].color.r * 255);
+		const colorG = Math.round(color.fills[0].color.g * 255);
+		const colorB = Math.round(color.fills[0].color.b * 255);
+		const colorA = roundToDecimal(color.fills[0].color.a * 1, 3);
+
 		let token = {
-			value: `rgba(${color.fills[0].color.r * 255}, ${color.fills[0].color.g * 255}, ${color
-				.fills[0].color.b * 255}, ${color.fills[0].color.a * 1})`
+			value: `rgba(${colorR}, ${colorG}, ${colorB}, ${colorA})`
 		};
 
 		let name = camelize(color.name);

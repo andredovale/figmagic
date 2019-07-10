@@ -9,7 +9,7 @@ export function setupSpacingTokens(frame) {
 
 	let spacings = {
 		global: {
-			type: 'lineHeight',
+			type: 'spacing',
 			category: 'web'
 		},
 		props: {}
