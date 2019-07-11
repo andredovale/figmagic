@@ -21,7 +21,7 @@ export function setupSpacingTokens(frame) {
 		}
 
 		let token = {
-			value: normalizeUnits(spacing.absoluteBoundingBox.width, 'px', 'em')
+			value: normalizeUnits(spacing.absoluteBoundingBox.width, 'px', 'rem')
 		};
 
 		let name = camelize(spacing.name);
