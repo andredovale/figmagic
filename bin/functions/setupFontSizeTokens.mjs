@@ -1,6 +1,6 @@
-import { units } from '../meta/units.mjs';
 import { camelize } from './camelize.mjs';
 import { formatName } from './formatName.mjs';
+import { normalizeUnits } from './normalizeUnits.mjs';
 
 export function setupFontSizeTokens(frame) {
 	if (!frame) {
@@ -21,7 +21,7 @@ export function setupFontSizeTokens(frame) {
 		}
 
 		let token = {
-			value: fontSize.style.fontSize / units.globalRemSize + 'rem' // TODO: Use a converter function?
+			value: normalizeUnits(fontSize.style.fontSize, 'px', 'rem')
 		};
 
 		let name = camelize(fontSize.name);
