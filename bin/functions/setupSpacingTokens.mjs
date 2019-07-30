@@ -9,7 +9,7 @@ export function setupSpacingTokens(frame) {
 
 	let spacings = {
 		global: {
-			type: 'lineHeight',
+			type: 'spacing',
 			category: 'web'
 		},
 		props: {}
@@ -21,7 +21,7 @@ export function setupSpacingTokens(frame) {
 		}
 
 		let token = {
-			value: normalizeUnits(spacing.absoluteBoundingBox.width, 'px', 'em')
+			value: normalizeUnits(spacing.absoluteBoundingBox.width, 'px', 'rem')
 		};
 
 		let name = camelize(spacing.name);

@@ -21,7 +21,7 @@ export function setupLineHeightTokens(frame) {
 		}
 
 		let token = {
-			value: normalizeUnits(lineHeight.style.lineHeightPercent, 'percent', 'unitless')
+			value: normalizeUnits(lineHeight.style.lineHeightPx, 'px', 'rem')
 		};
 
 		let name = camelize(lineHeight.name);

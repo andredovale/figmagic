@@ -10,7 +10,7 @@ export function formatName(str) {
 		throw new Error('No string for formatName()!');
   }
 
-	const forbiddenCharacters = ['-', '–', '—', '|', '.'];
+	const forbiddenCharacters = ['–', '—', '|', '.'];
 
 	let fixedString = str;
 
