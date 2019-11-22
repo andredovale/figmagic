@@ -16,10 +16,10 @@ _Built initially as an internal handoff tool for [Humblebee](https://www.humbleb
 
 Figmagic versions pre-1.0 were primarily used as an in-house, internal tool at Humblebee. The focus was therefore less on being a good, general tool and didn't enjoy any large amount of testing and so on. The goal with 1.0 has been to minimize any friction in using, implementing and trusting Figmagic for your design token needs.
 
-- With version 1.0, the scope has been focused only on generating design tokens. If you relied on Figmagic to generate specs, or component renders (etc.) then none of those functions exist in this, new version.
-- It should now also work on Windows, since we don't rely on Bash scripts anymore. Cross-platform for the win!
-- Much easier to install and use, since it's a global module rather than a crappily-crafted dependency that's going to break on you whenever there's an update.
-- More error handling, thank God for that...
+-   With version 1.0, the scope has been focused only on generating design tokens. If you relied on Figmagic to generate specs, or component renders (etc.) then none of those functions exist in this, new version.
+-   It should now also work on Windows, since we don't rely on Bash scripts anymore. Cross-platform for the win!
+-   Much easier to install and use, since it's a global module rather than a crappily-crafted dependency that's going to break on you whenever there's an update.
+-   More error handling, thank God for that...
 
 Note: I've kept the old design system template around, but also updated with a new one to correspond with changes in version 1.0+.
 
@@ -29,8 +29,8 @@ There's a lot to say here about the use cases and approaches taken by other tool
 
 The basic idea of Figmagic is to support an informed handoff between designers and developers. I believe the best way to do this in a solid, mature, and non-impeding way is:
 
-- Expect relative and current value types that are optimally suited for each typology (unitless for line heights, rems for font sizes...). Don't use or expect px values in most cases.
-- Transform values into a common set of tokens rather than output exact values, ie. use something like \${colors.midGray} rather than #3C3C3C.
+-   Expect relative and current value types that are optimally suited for each typology (unitless for line heights, rems for font sizes...). Don't use or expect px values in most cases.
+-   Transform values into a common set of tokens rather than output exact values, ie. use something like \${colors.midGray} rather than #3C3C3C.
 
 ## Example project
 
@@ -38,19 +38,19 @@ An example project—using React, Webpack and Styled Components—is available a
 
 ### Installation
 
-- Clone Figmagic
-- Step into the Figmagic directory, and run `yarn setup` or `npm setup` to add it globally to your system
-- Step into a project directory, and add or replace **FIGMA_URL** and **FIGMA_TOKEN** in .env with your own file ID and token key (for more on this, [go to Figma's developer docs](https://www.figma.com/developers/docs))
-- Run `figmagic` (default is .MJS token files), or `figmagic js` if you want to have regular old .JS files instead
-- You should now have a `/figma` and `/tokens` folder in the root! The `/tokens` folder has the good stuff you want :)
+-   Clone Figmagic
+-   Step into the Figmagic directory, and run `yarn setup` or `npm setup` to add it globally to your system
+-   Step into a project directory, and add or replace **FIGMA_URL** and **FIGMA_TOKEN** in .env with your own file ID and token key (for more on this, [go to Figma's developer docs](https://www.figma.com/developers/docs))
+-   Run `figmagic` (default is token files), or `figmagic js` if you want to have regular old .JS files instead
+-   You should now have a `/figma` and `/tokens` folder in the root! The `/tokens` folder has the good stuff you want :)
 
 ## Figma setup
 
 Your structure needs to correspond to the following:
 
-- A Page needs to exist, called "Design tokens". In case you have more than one page, put "Design tokens" as the very first (just in case)
-- Further, inside the "Design tokens" page, frames need to be exist. Name them "Colors", "Font sizes", "Font families", "Font weights", "Line heights", and "Spacing" – exact casing is not important, however the **spelling is important!**
-- All items on a page need to be contained within one or more frames
+-   A Page needs to exist, called "Design tokens". In case you have more than one page, put "Design tokens" as the very first (just in case)
+-   Further, inside the "Design tokens" page, frames need to be exist. Name them "Colors", "Font sizes", "Font families", "Font weights", "Line heights", and "Spacing" – exact casing is not important, however the **spelling is important!**
+-   All items on a page need to be contained within one or more frames
 
 See a demo/template at [https://www.figma.com/file/UkrKTnjjKB0lJKYAifn9YWXU/Figmagic---Design-Token-Example-v1.0](https://www.figma.com/file/UkrKTnjjKB0lJKYAifn9YWXU/Figmagic---Design-Token-Example-v1.0). Feel free to simply copy it and paste it into your own document.
 
@@ -102,9 +102,9 @@ Em units.
 
 ## Structure
 
-- `bin` contains the project's MJS/JS files; `bin/functions` contains most of the functions
-- `figma` will contain the extracted Figma JSON and various build-time JSON files
-- `tokens` will contain the token files (in .mjs format)
+-   `bin` contains the project's MJS/JS files; `bin/functions` contains most of the functions
+-   `figma` will contain the extracted Figma JSON and various build-time JSON files
+-   `tokens` will contain the token files (in format)
 
 ## Want to add or rethink something in Figmagic?
 
