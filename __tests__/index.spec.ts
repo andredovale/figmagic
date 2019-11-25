@@ -1,16 +1,16 @@
-import rimraf from "rimraf";
-import { writeTokens } from "../src/functions/writeTokens";
+// import rimraf from "rimraf";
+import { writeTokens } from "../src/functions/write-tokens";
 
 jest.mock("fs");
 jest.mock("rimraf");
 jest.mock("dotenv");
 
-jest.mock("../src/functions/getFromApi", () => ({
+jest.mock("../src/functions/get-from-api", () => ({
 	getFromApi: jest.fn(() => ({
 		document: { children: [{ name: "Design Tokens" }] }
 	}))
 }));
-jest.mock("../src/functions/writeTokens", () => ({ writeTokens: jest.fn() }));
+jest.mock("../src/functions/write-tokens", () => ({ writeTokens: jest.fn() }));
 
 describe("Process values", () => {
 	const OLD_ARGV = process.argv;
@@ -24,25 +24,12 @@ describe("Process values", () => {
 		process.argv = OLD_ARGV;
 	});
 
-	test("It should run figmagic", () => {
-		process.argv = [];
-
-		import("../src/index").then(() => {
-			expect(
-				(rimraf as jest.MockedFunction<typeof rimraf>).mock.calls
-			).toEqual([
-				["./tokens", () => {}],
-				["./figma", () => {}]
-			]);
-			expect((writeTokens as jest.Mock).mock.calls.length).toBe(1);
-		});
-	});
-
 	test("It should run with format", () => {
 		process.argv = ["", "", "js"];
 
-		import("../src/index").then(() => {
-			expect((writeTokens as jest.Mock).mock.calls.length).toBe(1);
-		});
+		const index = require("../src/index");
+		index;
+
+		expect(writeTokens).toBeCalled();
 	});
 });

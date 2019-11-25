@@ -1,7 +1,2 @@
-const globalPxSize = 1;
-const globalRemSize = 16;
-
-export const units = {
-	globalPxSize,
-	globalRemSize
-};
+export const SIZES_PX = 1;
+export const SIZES_REM = 16;

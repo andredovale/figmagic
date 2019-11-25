@@ -1,11 +1,11 @@
-import { createFolder } from "./functions/createFolder";
-import { getFromApi } from "./functions/getFromApi";
-import { createPage } from "./functions/createPage";
-import { writeTokens } from "./functions/writeTokens";
+import { createFolder } from "./functions/create-folder";
+import { getFromApi } from "./functions/get-from-api";
+import { createPage } from "./functions/create-page";
+import { writeTokens } from "./functions/write-tokens";
 
 import rimraf from "rimraf";
-import { config } from "dotenv";
-config();
+import dotenv from "dotenv";
+dotenv.config();
 
 const [, , ...args] = process.argv;
 const format = args[0]?.toLowerCase() ?? "js";

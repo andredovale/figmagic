@@ -13,15 +13,10 @@ export default {
 	},
 	plugins: [
 		resolve(),
-		commonjs({
-			include: /node_modules/
-		}),
+		commonjs(),
 		typescript({
 			verbosity: 2
 		})
 	],
-	external: [
-		...Object.keys({ ...pkg.dependencies, ...pkg.peerDependencies })
-	],
-	context: "window"
+	external: ["fs", ...Object.keys({ ...pkg.dependencies })]
 };

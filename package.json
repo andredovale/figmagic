@@ -10,30 +10,31 @@
 		"salesforce theo"
 	],
 	"homepage": "https://www.figmagic.com",
-	"version": "1.0.17",
+	"version": "1.0.18",
 	"author": "Mikael Vesavuori",
 	"main": "dist/index.js",
 	"license": "MIT",
 	"devDependencies": {
-		"@types/dotenv": "^8.2.0",
 		"@types/jest": "^24.0.23",
 		"@types/js-yaml": "^3.12.1",
-		"@types/node-fetch": "^2.5.3",
+		"@types/lodash": "^4.14.149",
+		"@types/node-fetch": "^2.5.4",
 		"@types/rimraf": "^2.0.3",
 		"husky": "^3.0.9",
 		"jest": "^24.1.0",
 		"prettier": "^1.16.4",
 		"pretty-quick": "^2.0.1",
-		"rollup": "^1.27.3",
+		"rollup": "^1.27.5",
 		"rollup-plugin-commonjs": "^10.1.0",
 		"rollup-plugin-node-resolve": "^5.2.0",
 		"rollup-plugin-typescript2": "^0.25.2",
-		"ts-jest": "^24.1.0",
+		"ts-jest": "^24.2.0",
 		"typescript": "^3.7.2"
 	},
 	"dependencies": {
 		"dotenv": "^8.2.0",
 		"js-yaml": "^3.13.1",
+		"lodash": "^4.17.15",
 		"node-fetch": "^2.3.0",
 		"rimraf": "^3.0.0"
 	},
@@ -42,7 +43,7 @@
 	},
 	"scripts": {
 		"build": "rollup -c && chmod u+x dist/index.js",
-		"setup": "rm -rf yarn.lock && rm -rf /node_modules && rm -rf /usr/local/lib/node_modules/figmagic && npm install -g",
+		"setup": "rm -rf yarn.lock node_modules/ /usr/local/lib/node_modules/figmagic && npm install -g",
 		"figmagic": "node ./dist/index",
 		"test": "npx jest",
 		"precommit": "echo Running pre-commit linting... && pretty-quick --staged && npm --no-git-tag-version version patch && git add package.json"
