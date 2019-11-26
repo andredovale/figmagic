@@ -1279,6 +1279,25 @@ var write = function(file, path, name, isToken, format) {
 	fs.writeFile(filePath, fileContent, "utf-8", function(error) {
 		if (error) throw new Error("Error in write() > writeFile(): " + error);
 	});
+	if (typeof file === "object") {
+		fs.writeFile(
+			filePath.replace("." + format, ".d.ts"),
+			"export default " +
+				camelCase_1(name) +
+				";\ndeclare const " +
+				camelCase_1(name) +
+				': {\n\t"' +
+				Object.keys(file).join('": string;\n	"') +
+				'": string;\n};\n',
+			"utf-8",
+			function(error) {
+				if (error)
+					throw new Error(
+						"Error in write TypeScript .d.ts file: " + error
+					);
+			}
+		);
+	}
 };
 
 var getFromApi = function() {

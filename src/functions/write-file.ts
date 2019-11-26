@@ -57,4 +57,20 @@ const write = (
 	fs.writeFile(filePath, fileContent, "utf-8", error => {
 		if (error) throw new Error(`Error in write() > writeFile(): ${error}`);
 	});
+
+	if (typeof file === "object") {
+		fs.writeFile(
+			filePath.replace(`.${format}`, ".d.ts"),
+			`export default ${camelCase(name)};\ndeclare const ${camelCase(
+				name
+			)}: {\n	"${Object.keys(file).join('": string;\n	"')}": string;\n};\n`,
+			"utf-8",
+			error => {
+				if (error)
+					throw new Error(
+						`Error in write TypeScript .d.ts file: ${error}`
+					);
+			}
+		);
+	}
 };

@@ -10,7 +10,7 @@
 		"salesforce theo"
 	],
 	"homepage": "https://www.figmagic.com",
-	"version": "1.0.18",
+	"version": "1.0.19",
 	"author": "Mikael Vesavuori",
 	"main": "dist/index.js",
 	"license": "MIT",
@@ -39,7 +39,7 @@
 		"rimraf": "^3.0.0"
 	},
 	"bin": {
-		"figmagic": "./dist/index"
+		"figmagic": "./dist/index.js"
 	},
 	"scripts": {
 		"build": "rollup -c && chmod u+x dist/index.js",
