@@ -1,8 +1,12 @@
 import kebabCase from "lodash/kebabCase";
 import { roundToDecimal } from "./round-to-decimal";
 import { Frame } from "../types/frame";
+import { recursiveSetup } from "./recursive-setup";
 
-export const setupColorTokens = (frame: Frame) => {
+export const setupColorTokens = (
+	frame: Frame,
+	styles: { [key: string]: { name: string } }
+) => {
 	if (!frame) throw new Error("No frame for setupColorTokens()!");
 
 	if (!frame.children || !frame.children.length)
@@ -10,7 +14,7 @@ export const setupColorTokens = (frame: Frame) => {
 
 	const colors: { [key: string]: string } = {};
 
-	for (let color of frame.children) {
+	recursiveSetup(frame.children, color => {
 		const colorR = Math.round(color.fills[0].color.r * 255);
 		const colorG = Math.round(color.fills[0].color.g * 255);
 		const colorB = Math.round(color.fills[0].color.b * 255);
@@ -18,9 +22,9 @@ export const setupColorTokens = (frame: Frame) => {
 
 		const token = `rgba(${colorR}, ${colorG}, ${colorB}, ${colorA})`;
 
-		const name = kebabCase(color.name);
+		const name = kebabCase(styles[color.styles?.fill]?.name ?? color.name);
 		colors[name] = token;
-	}
+	});
 
 	return colors;
 };

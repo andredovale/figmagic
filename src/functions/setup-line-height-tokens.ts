@@ -1,6 +1,7 @@
 import kebabCase from "lodash/kebabCase";
 import { normalizeUnits } from "./normalize-units";
 import { Frame } from "../types/frame";
+import { recursiveSetup } from "./recursive-setup";
 
 export const setupLineHeightTokens = (frame: Frame) => {
 	if (!frame) throw new Error("No frame for setupLineHeightTokens()!");
@@ -10,7 +11,7 @@ export const setupLineHeightTokens = (frame: Frame) => {
 
 	const lineHeights: { [key: string]: string | void } = {};
 
-	for (let lineHeight of frame.children) {
+	recursiveSetup(frame.children, lineHeight => {
 		const token = normalizeUnits(
 			lineHeight.style.lineHeightPx,
 			"px",
@@ -19,7 +20,7 @@ export const setupLineHeightTokens = (frame: Frame) => {
 
 		const name = kebabCase(lineHeight.name);
 		lineHeights[name] = token;
-	}
+	});
 
 	return lineHeights;
 };

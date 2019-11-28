@@ -1,5 +1,6 @@
 import kebabCase from "lodash/kebabCase";
 import { Frame } from "../types/frame";
+import { recursiveSetup } from "./recursive-setup";
 
 export const setupRadiusTokens = (frame: Frame) => {
 	if (!frame) throw new Error("No frame for setupRadiusTokens()!");
@@ -9,12 +10,24 @@ export const setupRadiusTokens = (frame: Frame) => {
 
 	const radii: { [key: string]: string } = {};
 
-	for (let radius of frame.children) {
-		const token = radius.cornerRadius + "px";
+	recursiveSetup(frame.children, radius => {
+		if (radius.type !== "RECTANGLE") return;
+
+		let token;
+
+		if (radius.rectangleCornerRadii) {
+			token = radius.rectangleCornerRadii
+				.map(radius => `${radius}px`)
+				.join(" ");
+		} else if (radius.cornerRadius) {
+			token = `${radius.cornerRadius}px`;
+		} else {
+			token = "0";
+		}
 
 		const name = kebabCase(radius.name);
 		radii[name] = token;
-	}
+	});
 
 	return radii;
 };

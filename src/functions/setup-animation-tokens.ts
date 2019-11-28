@@ -1,5 +1,6 @@
 import kebabCase from "lodash/kebabCase";
 import { Frame } from "../types/frame";
+import { recursiveSetup } from "./recursive-setup";
 
 export const setupAnimationTokens = (frame: Frame) => {
 	if (!frame) throw new Error("No frame for setupAnimationTokens()!");
@@ -9,12 +10,12 @@ export const setupAnimationTokens = (frame: Frame) => {
 
 	const animations: { [key: string]: string } = {};
 
-	for (let animation of frame.children) {
+	recursiveSetup(frame.children, animation => {
 		const token = animation.absoluteBoundingBox.width + "ms";
 
 		const name = kebabCase(animation.name);
 		animations[name] = token;
-	}
+	});
 
 	return animations;
 };

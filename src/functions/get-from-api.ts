@@ -27,7 +27,9 @@ export const getFromApi = async () => {
 			writeFile(
 				JSON.stringify(json, undefined, 2),
 				"figma",
-				"figma.json"
+				"figma",
+				false,
+				"json"
 			);
 		});
 

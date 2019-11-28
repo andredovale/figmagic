@@ -1,6 +1,7 @@
 import kebabCase from "lodash/kebabCase";
 import { normalizeUnits } from "./normalize-units";
 import { Frame } from "../types/frame";
+import { recursiveSetup } from "./recursive-setup";
 
 export const setupSpacingTokens = (frame: Frame) => {
 	if (!frame) throw new Error("No frame for setupSpacingTokens()!");
@@ -10,7 +11,9 @@ export const setupSpacingTokens = (frame: Frame) => {
 
 	const spacings: { [key: string]: string | void } = {};
 
-	for (let spacing of frame.children) {
+	recursiveSetup(frame.children, spacing => {
+		if (spacing.type !== "RECTANGLE") return;
+
 		const token = normalizeUnits(
 			spacing.absoluteBoundingBox.width,
 			"px",
@@ -19,7 +22,7 @@ export const setupSpacingTokens = (frame: Frame) => {
 
 		const name = kebabCase(spacing.name);
 		spacings[name] = token;
-	}
+	});
 
 	return spacings;
 };

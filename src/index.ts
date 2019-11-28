@@ -20,5 +20,6 @@ const format = args[0]?.toLowerCase() ?? "js";
 	const data = await getFromApi();
 
 	const tokens = createPage(data.document.children);
-	writeTokens(tokens.children, format);
+	const styles = data.styles;
+	writeTokens(tokens.children, format, styles);
 })();

@@ -48,11 +48,11 @@ const write = (
 			fileContent = `const ${camelCaseName} = ${JSON.stringify(
 				file,
 				null,
-				" "
+				"	"
 			)}\n\nexport default ${camelCaseName};`;
 		}
-		filePath += `.${format}`;
 	}
+	filePath += `.${format}`;
 
 	fs.writeFile(filePath, fileContent, "utf-8", error => {
 		if (error) throw new Error(`Error in write() > writeFile(): ${error}`);

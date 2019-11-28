@@ -1269,13 +1269,13 @@ var write = function(file, path, name, isToken, format) {
 				"const " +
 				camelCaseName +
 				" = " +
-				JSON.stringify(file, null, " ") +
+				JSON.stringify(file, null, "	") +
 				"\n\nexport default " +
 				camelCaseName +
 				";";
 		}
-		filePath += "." + format;
 	}
+	filePath += "." + format;
 	fs.writeFile(filePath, fileContent, "utf-8", function(error) {
 		if (error) throw new Error("Error in write() > writeFile(): " + error);
 	});
@@ -1335,7 +1335,9 @@ var getFromApi = function() {
 								writeFile(
 									JSON.stringify(json, undefined, 2),
 									"figma",
-									"figma.json"
+									"figma",
+									false,
+									"json"
 								);
 							})
 					];
@@ -1382,13 +1384,24 @@ var roundToDecimal = function(value, decimals) {
 	return Number(Math.round(Number(value + "e" + decimals)) + "e-" + decimals);
 };
 
-var setupColorTokens = function(frame) {
+var recursiveSetup = function(children, processItem) {
+	for (var _i = 0, children_1 = children; _i < children_1.length; _i++) {
+		var item = children_1[_i];
+		if (item.children) {
+			recursiveSetup(item.children, processItem);
+			continue;
+		}
+		processItem(item);
+	}
+};
+
+var setupColorTokens = function(frame, styles) {
 	if (!frame) throw new Error("No frame for setupColorTokens()!");
 	if (!frame.children || !frame.children.length)
 		throw new Error('The frame "' + frame.name + "\" don't have children!");
 	var colors = {};
-	for (var _i = 0, _a = frame.children; _i < _a.length; _i++) {
-		var color = _a[_i];
+	recursiveSetup(frame.children, function(color) {
+		var _a, _b, _c;
 		var colorR = Math.round(color.fills[0].color.r * 255);
 		var colorG = Math.round(color.fills[0].color.g * 255);
 		var colorB = Math.round(color.fills[0].color.b * 255);
@@ -1403,9 +1416,20 @@ var setupColorTokens = function(frame) {
 			", " +
 			colorA +
 			")";
-		var name_1 = kebabCase_1(color.name);
-		colors[name_1] = token;
-	}
+		var name = kebabCase_1(
+			((_c =
+				(_b =
+					styles[
+						(_a = color.styles) === null || _a === void 0
+							? void 0
+							: _a.fill
+					]) === null || _b === void 0
+					? void 0
+					: _b.name),
+			_c !== null && _c !== void 0 ? _c : color.name)
+		);
+		colors[name] = token;
+	});
 	return colors;
 };
 
@@ -1436,16 +1460,16 @@ var setupSpacingTokens = function(frame) {
 	if (!frame.children || !frame.children.length)
 		throw new Error('The frame "' + frame.name + "\" don't have children!");
 	var spacings = {};
-	for (var _i = 0, _a = frame.children; _i < _a.length; _i++) {
-		var spacing = _a[_i];
+	recursiveSetup(frame.children, function(spacing) {
+		if (spacing.type !== "RECTANGLE") return;
 		var token = normalizeUnits(
 			spacing.absoluteBoundingBox.width,
 			"px",
 			"rem"
 		);
-		var name_1 = kebabCase_1(spacing.name);
-		spacings[name_1] = token;
-	}
+		var name = kebabCase_1(spacing.name);
+		spacings[name] = token;
+	});
 	return spacings;
 };
 
@@ -1454,15 +1478,14 @@ var setupFontTokens = function(frame) {
 	if (!frame.children || !frame.children.length)
 		throw new Error('The frame "' + frame.name + "\" don't have children!");
 	var fonts = {};
-	for (var _i = 0, _a = frame.children; _i < _a.length; _i++) {
-		var font = _a[_i];
+	recursiveSetup(frame.children, function(font) {
 		var token = {
 			name: font.style.fontFamily,
 			"post-script": font.style.fontPostScriptName
 		};
-		var name_1 = kebabCase_1(font.name);
-		fonts[name_1] = token;
-	}
+		var name = kebabCase_1(font.name);
+		fonts[name] = token;
+	});
 	return fonts;
 };
 
@@ -1471,12 +1494,11 @@ var setupFontSizeTokens = function(frame) {
 	if (!frame.children || !frame.children.length)
 		throw new Error('The frame "' + frame.name + "\" don't have children!");
 	var fontSizes = {};
-	for (var _i = 0, _a = frame.children; _i < _a.length; _i++) {
-		var fontSize = _a[_i];
+	recursiveSetup(frame.children, function(fontSize) {
 		var token = normalizeUnits(fontSize.style.fontSize, "px", "rem");
-		var name_1 = kebabCase_1(fontSize.name);
-		fontSizes[name_1] = token;
-	}
+		var name = kebabCase_1(fontSize.name);
+		fontSizes[name] = token;
+	});
 	return fontSizes;
 };
 
@@ -1485,12 +1507,11 @@ var setupFontWeightTokens = function(frame) {
 	if (!frame.children || !frame.children.length)
 		throw new Error('The frame "' + frame.name + "\" don't have children!");
 	var fontWeights = {};
-	for (var _i = 0, _a = frame.children; _i < _a.length; _i++) {
-		var fontWeight = _a[_i];
+	recursiveSetup(frame.children, function(fontWeight) {
 		var token = fontWeight.style.fontWeight;
-		var name_1 = kebabCase_1(fontWeight.name);
-		fontWeights[name_1] = token;
-	}
+		var name = kebabCase_1(fontWeight.name);
+		fontWeights[name] = token;
+	});
 	return fontWeights;
 };
 
@@ -1499,12 +1520,11 @@ var setupLineHeightTokens = function(frame) {
 	if (!frame.children || !frame.children.length)
 		throw new Error('The frame "' + frame.name + "\" don't have children!");
 	var lineHeights = {};
-	for (var _i = 0, _a = frame.children; _i < _a.length; _i++) {
-		var lineHeight = _a[_i];
+	recursiveSetup(frame.children, function(lineHeight) {
 		var token = normalizeUnits(lineHeight.style.lineHeightPx, "px", "rem");
-		var name_1 = kebabCase_1(lineHeight.name);
-		lineHeights[name_1] = token;
-	}
+		var name = kebabCase_1(lineHeight.name);
+		lineHeights[name] = token;
+	});
 	return lineHeights;
 };
 
@@ -1513,12 +1533,23 @@ var setupRadiusTokens = function(frame) {
 	if (!frame.children || !frame.children.length)
 		throw new Error('The frame "' + frame.name + "\" don't have children!");
 	var radii = {};
-	for (var _i = 0, _a = frame.children; _i < _a.length; _i++) {
-		var radius = _a[_i];
-		var token = radius.cornerRadius + "px";
-		var name_1 = kebabCase_1(radius.name);
-		radii[name_1] = token;
-	}
+	recursiveSetup(frame.children, function(radius) {
+		if (radius.type !== "RECTANGLE") return;
+		var token;
+		if (radius.rectangleCornerRadii) {
+			token = radius.rectangleCornerRadii
+				.map(function(radius) {
+					return radius + "px";
+				})
+				.join(" ");
+		} else if (radius.cornerRadius) {
+			token = radius.cornerRadius + "px";
+		} else {
+			token = "0";
+		}
+		var name = kebabCase_1(radius.name);
+		radii[name] = token;
+	});
 	return radii;
 };
 
@@ -1527,22 +1558,21 @@ var setupBorderTokens = function(frame) {
 	if (!frame.children || !frame.children.length)
 		throw new Error('The frame "' + frame.name + "\" don't have children!");
 	var borders = {};
-	for (var _i = 0, _a = frame.children; _i < _a.length; _i++) {
-		var border = _a[_i];
+	recursiveSetup(frame.children, function(border) {
 		var token = border.strokeWeight + "px " + border.strokes[0].type;
-		var name_1 = kebabCase_1(border.name);
-		borders[name_1] = token;
-	}
+		var name = kebabCase_1(border.name);
+		borders[name] = token;
+	});
 	return borders;
 };
 
-var setupShadowTokens = function(frame) {
+var setupShadowTokens = function(frame, styles) {
 	if (!frame) throw new Error("No frame for setupShadowTokens()!");
 	if (!frame.children || !frame.children.length)
 		throw new Error('The frame "' + frame.name + "\" don't have children!");
 	var shadows = {};
-	for (var _i = 0, _a = frame.children; _i < _a.length; _i++) {
-		var shadow = _a[_i];
+	recursiveSetup(frame.children, function(shadow) {
+		var _a, _b, _c;
 		var shadowOffsetX = shadow.effects[0].offset.x + "px ";
 		var shadowOffsetY = shadow.effects[0].offset.y + "px ";
 		var shadowRadius = shadow.effects[0].radius + "px ";
@@ -1561,9 +1591,20 @@ var setupShadowTokens = function(frame) {
 			shadowColorA +
 			")";
 		var token = shadowOffsetX + shadowOffsetY + shadowRadius + shadowColor;
-		var name_1 = kebabCase_1(shadow.name);
-		shadows[name_1] = token;
-	}
+		var name = kebabCase_1(
+			((_c =
+				(_b =
+					styles[
+						(_a = shadow.styles) === null || _a === void 0
+							? void 0
+							: _a.effect
+					]) === null || _b === void 0
+					? void 0
+					: _b.name),
+			_c !== null && _c !== void 0 ? _c : shadow.name)
+		);
+		shadows[name] = token;
+	});
 	return shadows;
 };
 
@@ -1572,16 +1613,55 @@ var setupAnimationTokens = function(frame) {
 	if (!frame.children || !frame.children.length)
 		throw Error('The frame "' + frame.name + "\" don't have children!");
 	var animations = {};
-	for (var _i = 0, _a = frame.children; _i < _a.length; _i++) {
-		var animation = _a[_i];
+	recursiveSetup(frame.children, function(animation) {
 		var token = animation.absoluteBoundingBox.width + "ms";
-		var name_1 = kebabCase_1(animation.name);
-		animations[name_1] = token;
-	}
+		var name = kebabCase_1(animation.name);
+		animations[name] = token;
+	});
 	return animations;
 };
 
-var processTokens = function(sheet, name) {
+var setupMixinTokens = function(frame) {
+	if (!frame) throw new Error("No frame for setupMixinTokens()!");
+	if (!frame.children || !frame.children.length)
+		throw new Error('The frame "' + frame.name + "\" don't have children!");
+	var mixins = {};
+	for (var _i = 0, _a = frame.children; _i < _a.length; _i++) {
+		var mixin = _a[_i];
+		if (mixin.type !== "GROUP" || !mixin.children) continue;
+		var token = mixin.children[0].characters;
+		var name_1 = kebabCase_1(mixin.name);
+		mixins[name_1] = token;
+	}
+	return mixins;
+};
+
+var setupGridTokens = function(frame) {
+	if (!frame) throw new Error("No frame for setupGridTokens()!");
+	if (!frame.children || !frame.children.length)
+		throw new Error('The frame "' + frame.name + "\" don't have children!");
+	if (frame.name.toLowerCase().match("module")) return;
+	var grid = {
+		"column-count": 1,
+		"column-width": "100%",
+		gutter: "0%",
+		"min-width": "0px"
+	};
+	grid["column-count"] = frame.children.length;
+	var columnWidth = frame.children[0].absoluteBoundingBox.width;
+	var canvasWidth = frame.absoluteBoundingBox.width;
+	grid["column-width"] = (columnWidth / canvasWidth) * 100 + "%";
+	grid.gutter =
+		((frame.children[1].absoluteBoundingBox.x -
+			(frame.children[0].absoluteBoundingBox.x + columnWidth)) /
+			canvasWidth) *
+			100 +
+		"%";
+	grid["min-width"] = canvasWidth + "px";
+	return grid;
+};
+
+var processTokens = function(sheet, name, styles) {
 	if (!sheet || !name)
 		throw new Error("No sheet or name for processTokens()!");
 	var loweredName = name.toLowerCase();
@@ -1592,7 +1672,9 @@ var processTokens = function(sheet, name) {
 			case !!loweredName.match("borders?"):
 				return setupBorderTokens(sheet);
 			case !!loweredName.match("colou?rs?"):
-				return setupColorTokens(sheet);
+				return setupColorTokens(sheet, styles);
+			case !!loweredName.match("grids?"):
+				return setupGridTokens(sheet);
 			case !!loweredName.match("fontsizes?"):
 				return setupFontSizeTokens(sheet);
 			case !!loweredName.match("fontfamil(y|ies)"):
@@ -1601,11 +1683,13 @@ var processTokens = function(sheet, name) {
 				return setupFontWeightTokens(sheet);
 			case !!loweredName.match("(font)?lineheights?"):
 				return setupLineHeightTokens(sheet);
+			case !!loweredName.match("mixins?|tim(e|ings?)"):
+				return setupMixinTokens(sheet);
 			case !!loweredName.match("radi(i|us)"):
 				return setupRadiusTokens(sheet);
 			case !!loweredName.match("shadows?"):
-				return setupShadowTokens(sheet);
-			case !!loweredName.match("spac(e|ings?)"):
+				return setupShadowTokens(sheet, styles);
+			case !!loweredName.match("spac(es?|ings?)"):
 				return setupSpacingTokens(sheet);
 		}
 	} catch (error) {
@@ -1613,12 +1697,12 @@ var processTokens = function(sheet, name) {
 	}
 };
 
-var writeTokens = function(tokens, format) {
+var writeTokens = function(tokens, format, styles) {
 	if (!tokens || !tokens.length)
 		throw new Error("Less than one token provided to writeTokens()!");
 	for (var _i = 0, tokens_1 = tokens; _i < tokens_1.length; _i++) {
 		var token = tokens_1[_i];
-		var processedToken = processTokens(token, token.name);
+		var processedToken = processTokens(token, token.name, styles);
 		if (processedToken)
 			writeFile(processedToken, "tokens", token.name, true, format);
 	}
@@ -1634,7 +1718,7 @@ var format =
 	_b !== null && _b !== void 0 ? _b : "js");
 (function() {
 	return __awaiter(void 0, void 0, void 0, function() {
-		var data, tokens;
+		var data, tokens, styles;
 		return __generator(this, function(_a) {
 			switch (_a.label) {
 				case 0:
@@ -1646,7 +1730,8 @@ var format =
 				case 1:
 					data = _a.sent();
 					tokens = createPage(data.document.children);
-					writeTokens(tokens.children, format);
+					styles = data.styles;
+					writeTokens(tokens.children, format, styles);
 					return [2 /*return*/];
 			}
 		});

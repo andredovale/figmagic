@@ -8,9 +8,15 @@ import { setupRadiusTokens } from "./setup-radius-tokens";
 import { setupBorderTokens } from "./setup-border-tokens";
 import { setupShadowTokens } from "./setup-shadow-tokens";
 import { setupAnimationTokens } from "./setup-animation-tokens";
+import { setupMixinTokens } from "./setup-mixin-tokens";
+import { setupGridTokens } from "./setup-grid-tokens";
 import { Frame } from "../types/frame";
 
-export const processTokens = (sheet: Frame, name: string) => {
+export const processTokens = (
+	sheet: Frame,
+	name: string,
+	styles: { [key: string]: { name: string } }
+) => {
 	if (!sheet || !name)
 		throw new Error("No sheet or name for processTokens()!");
 
@@ -25,7 +31,10 @@ export const processTokens = (sheet: Frame, name: string) => {
 				return setupBorderTokens(sheet);
 
 			case !!loweredName.match("colou?rs?"):
-				return setupColorTokens(sheet);
+				return setupColorTokens(sheet, styles);
+
+			case !!loweredName.match("grids?"):
+				return setupGridTokens(sheet);
 
 			case !!loweredName.match("fontsizes?"):
 				return setupFontSizeTokens(sheet);
@@ -39,13 +48,16 @@ export const processTokens = (sheet: Frame, name: string) => {
 			case !!loweredName.match("(font)?lineheights?"):
 				return setupLineHeightTokens(sheet);
 
+			case !!loweredName.match("mixins?|tim(e|ings?)"):
+				return setupMixinTokens(sheet);
+
 			case !!loweredName.match("radi(i|us)"):
 				return setupRadiusTokens(sheet);
 
 			case !!loweredName.match("shadows?"):
-				return setupShadowTokens(sheet);
+				return setupShadowTokens(sheet, styles);
 
-			case !!loweredName.match("spac(e|ings?)"):
+			case !!loweredName.match("spac(es?|ings?)"):
 				return setupSpacingTokens(sheet);
 		}
 	} catch (error) {

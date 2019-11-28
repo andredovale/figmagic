@@ -1,5 +1,6 @@
 import kebabCase from "lodash/kebabCase";
 import { Frame } from "../types/frame";
+import { recursiveSetup } from "./recursive-setup";
 
 export const setupFontWeightTokens = (frame: Frame) => {
 	if (!frame) throw new Error("No frame for setupFontWeightTokens()!");
@@ -9,12 +10,12 @@ export const setupFontWeightTokens = (frame: Frame) => {
 
 	const fontWeights: { [key: string]: number } = {};
 
-	for (let fontWeight of frame.children) {
+	recursiveSetup(frame.children, fontWeight => {
 		const token = fontWeight.style.fontWeight;
 
 		const name = kebabCase(fontWeight.name);
 		fontWeights[name] = token;
-	}
+	});
 
 	return fontWeights;
 };

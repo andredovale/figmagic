@@ -1,6 +1,7 @@
 import kebabCase from "lodash/kebabCase";
 import { normalizeUnits } from "./normalize-units";
 import { Frame } from "../types/frame";
+import { recursiveSetup } from "./recursive-setup";
 
 export const setupFontSizeTokens = (frame: Frame) => {
 	if (!frame) throw new Error("No frame for setupFontSizeTokens()!");
@@ -10,12 +11,12 @@ export const setupFontSizeTokens = (frame: Frame) => {
 
 	const fontSizes: { [key: string]: string | void } = {};
 
-	for (let fontSize of frame.children) {
+	recursiveSetup(frame.children, fontSize => {
 		const token = normalizeUnits(fontSize.style.fontSize, "px", "rem");
 
 		const name = kebabCase(fontSize.name);
 		fontSizes[name] = token;
-	}
+	});
 
 	return fontSizes;
 };

@@ -1,8 +1,12 @@
 import kebabCase from "lodash/kebabCase";
 import { roundToDecimal } from "./round-to-decimal";
 import { Frame } from "../types/frame";
+import { recursiveSetup } from "./recursive-setup";
 
-export const setupShadowTokens = (frame: Frame) => {
+export const setupShadowTokens = (
+	frame: Frame,
+	styles: { [key: string]: { name: string } }
+) => {
 	if (!frame) throw new Error("No frame for setupShadowTokens()!");
 
 	if (!frame.children || !frame.children.length)
@@ -10,7 +14,7 @@ export const setupShadowTokens = (frame: Frame) => {
 
 	const shadows: { [key: string]: string } = {};
 
-	for (let shadow of frame.children) {
+	recursiveSetup(frame.children, shadow => {
 		const shadowOffsetX = shadow.effects[0].offset.x + "px ";
 		const shadowOffsetY = shadow.effects[0].offset.y + "px ";
 		const shadowRadius = shadow.effects[0].radius + "px ";
@@ -23,9 +27,11 @@ export const setupShadowTokens = (frame: Frame) => {
 		const token =
 			shadowOffsetX + shadowOffsetY + shadowRadius + shadowColor;
 
-		const name = kebabCase(shadow.name);
+		const name = kebabCase(
+			styles[shadow.styles?.effect]?.name ?? shadow.name
+		);
 		shadows[name] = token;
-	}
+	});
 
 	return shadows;
 };
