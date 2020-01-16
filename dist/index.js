@@ -1,5 +1,4 @@
-#!/bin/sh
-":"; //# comment; exec /usr/bin/env node "$0" "$@"
+#! /usr/bin/env node
 "use strict";
 
 function _interopDefault(ex) {
@@ -7,10 +6,11 @@ function _interopDefault(ex) {
 }
 
 var fs = _interopDefault(require("fs"));
+var argv = _interopDefault(require("yargs"));
+var dotenv = _interopDefault(require("dotenv"));
+var rimraf = _interopDefault(require("rimraf"));
 var yaml = _interopDefault(require("js-yaml"));
 var fetch = _interopDefault(require("node-fetch"));
-var rimraf = _interopDefault(require("rimraf"));
-var dotenv = _interopDefault(require("dotenv"));
 
 /*! *****************************************************************************
 Copyright (c) Microsoft Corporation. All rights reserved.
@@ -26,6 +26,20 @@ MERCHANTABLITY OR NON-INFRINGEMENT.
 See the Apache Version 2.0 License for specific language governing permissions
 and limitations under the License.
 ***************************************************************************** */
+
+var __assign = function() {
+	__assign =
+		Object.assign ||
+		function __assign(t) {
+			for (var s, i = 1, n = arguments.length; i < n; i++) {
+				s = arguments[i];
+				for (var p in s)
+					if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+			}
+			return t;
+		};
+	return __assign.apply(this, arguments);
+};
 
 function __awaiter(thisArg, _arguments, P, generator) {
 	return new (P || (P = Promise))(function(resolve, reject) {
@@ -157,6 +171,19 @@ function __generator(thisArg, body) {
 		return { value: op[0] ? op[1] : void 0, done: true };
 	}
 }
+
+var lorem = "ipsum";
+var dolor = true;
+var sit = false;
+var amet = 123;
+var et = ["lament", true, false, 456];
+var defaultConfig = {
+	lorem: lorem,
+	dolor: dolor,
+	sit: sit,
+	amet: amet,
+	et: et
+};
 
 var createFolder = function(directory) {
 	if (!directory)
@@ -1708,14 +1735,69 @@ var writeTokens = function(tokens, format, styles) {
 	}
 };
 
-var _a, _b;
 dotenv.config();
-var _c = process.argv,
-	args = _c.slice(2);
-var format =
-	((_b =
-		(_a = args[0]) === null || _a === void 0 ? void 0 : _a.toLowerCase()),
-	_b !== null && _b !== void 0 ? _b : "js");
+if (!process.env.FIGMA_URL || !process.env.FIGMA_TOKEN)
+	throw new Error(
+		"The environment variables 'FIGMA_URL' or 'FIGMA_TOKEN' not provided(s)"
+	);
+var config = defaultConfig;
+var coerce = function(key, value) {
+	var _a;
+	config = __assign(__assign({}, config), ((_a = {}), (_a[key] = value), _a));
+	return value;
+};
+argv.alias({ help: "h", version: "v" })
+	.option("format", {
+		alias: "f",
+		coerce: function(value) {
+			return coerce("format", value);
+		},
+		choices: ["css", "js", "json", "sass", "scss"],
+		default: "js",
+		describe: "Choose a output format"
+	})
+	.option("config-file", {
+		alias: "c",
+		boolean: true,
+		coerce: function(configFile) {
+			if (configFile) {
+				config = __assign(
+					__assign({}, config),
+					JSON.parse(fs.readFileSync(".figmagic.json", "utf8"))
+				);
+			}
+			return configFile;
+		},
+		default: false,
+		describe: "Extend and modify the default config file: .figmagic.json"
+	})
+	.option("figma-url", {
+		alias: "u",
+		coerce: function(value) {
+			return coerce("figmaUrl", value);
+		},
+		default: process.env.FIGMA_URL,
+		required: false,
+		string: true
+	})
+	.option("figma-token", {
+		alias: "t",
+		coerce: function(value) {
+			return coerce("figmaToken", value);
+		},
+		default: process.env.FIGMA_TOKEN,
+		required: false,
+		string: true
+	})
+	.option("figma-page", {
+		alias: "p",
+		coerce: function(value) {
+			return coerce("figmaPage", value);
+		},
+		default: process.env.FIGMA_PAGE || "Design Tokens",
+		required: false,
+		string: true
+	});
 (function() {
 	return __awaiter(void 0, void 0, void 0, function() {
 		var data, tokens, styles;
@@ -1731,7 +1813,7 @@ var format =
 					data = _a.sent();
 					tokens = createPage(data.document.children);
 					styles = data.styles;
-					writeTokens(tokens.children, format, styles);
+					writeTokens(tokens.children, config.format, styles);
 					return [2 /*return*/];
 			}
 		});

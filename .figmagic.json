@@ -1,0 +1,7 @@
+{
+	"lorem": "ipsum",
+	"dolor": true,
+	"sit": false,
+	"amet": 123,
+	"et": ["lament", true, false, 456]
+}
