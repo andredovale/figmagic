@@ -5,12 +5,11 @@ function _interopDefault(ex) {
 	return ex && typeof ex === "object" && "default" in ex ? ex["default"] : ex;
 }
 
-var fs = _interopDefault(require("fs"));
+var rimraf = _interopDefault(require("rimraf"));
+var fetch = _interopDefault(require("node-fetch"));
 var argv = _interopDefault(require("yargs"));
 var dotenv = _interopDefault(require("dotenv"));
-var rimraf = _interopDefault(require("rimraf"));
-var yaml = _interopDefault(require("js-yaml"));
-var fetch = _interopDefault(require("node-fetch"));
+var fs = _interopDefault(require("fs"));
 
 /*! *****************************************************************************
 Copyright (c) Microsoft Corporation. All rights reserved.
@@ -172,24 +171,111 @@ function __generator(thisArg, body) {
 	}
 }
 
-var lorem = "ipsum";
-var dolor = true;
-var sit = false;
-var amet = 123;
-var et = ["lament", true, false, 456];
+var figmaUrl = "";
+var figmaToken = "";
+var figmaPage = "Design Tokens";
+var format = "js";
+var apiBaseUrl = "https://api.figma.com/v1/files/";
+var figmaJson = false;
+var figmaTokens = true;
+var outputColorFormat = "rgba";
+var outputCSSUnit = "em";
+var outputNameFormat = "kebab";
+var recursive = true;
+var tokens = [
+	{
+		frameName: "time",
+		name: "animation",
+		outputNameFormat: "snake",
+		path: "absoluteBoundingBox.width",
+		postfix: "ms"
+	}
+];
 var defaultConfig = {
-	lorem: lorem,
-	dolor: dolor,
-	sit: sit,
-	amet: amet,
-	et: et
+	figmaUrl: figmaUrl,
+	figmaToken: figmaToken,
+	figmaPage: figmaPage,
+	format: format,
+	apiBaseUrl: apiBaseUrl,
+	figmaJson: figmaJson,
+	figmaTokens: figmaTokens,
+	outputColorFormat: outputColorFormat,
+	outputCSSUnit: outputCSSUnit,
+	outputNameFormat: outputNameFormat,
+	recursive: recursive,
+	tokens: tokens
 };
 
-var createFolder = function(directory) {
-	if (!directory)
-		throw new Error("No directory specified for createFolder()!");
-	if (!fs.existsSync(directory)) fs.mkdirSync(directory);
+dotenv.config();
+var config = defaultConfig;
+var coerce = function(key, value) {
+	var _a;
+	config = __assign(__assign({}, config), ((_a = {}), (_a[key] = value), _a));
+	return value;
 };
+argv
+	.alias({ help: "h", version: "v" })
+	.option("format", {
+		alias: "f",
+		coerce: function(value) {
+			return coerce("format", value);
+		},
+		choices: ["css", "js", "json", "sass", "scss"],
+		default: "js",
+		describe: "Choose a output format"
+	})
+	.option("config-file", {
+		alias: "c",
+		boolean: true,
+		coerce: function(configFile) {
+			if (configFile) {
+				config = __assign(
+					__assign({}, config),
+					JSON.parse(fs.readFileSync(".figmagic.json", "utf8"))
+				);
+			}
+			return configFile;
+		},
+		default: false,
+		describe: "Extend and modify the default config file: .figmagic.json"
+	})
+	.option("figma-url", {
+		alias: "u",
+		coerce: function(value) {
+			return coerce("figmaUrl", value);
+		},
+		default: process.env.FIGMA_URL,
+		describe: "Figma project identification URI",
+		required: false,
+		string: true
+	})
+	.option("figma-token", {
+		alias: "t",
+		coerce: function(value) {
+			return coerce("figmaToken", value);
+		},
+		default: process.env.FIGMA_TOKEN,
+		describe: "Figma development API authorization token",
+		required: false,
+		string: true
+	})
+	.option("figma-page", {
+		alias: "p",
+		coerce: function(value) {
+			return coerce("figmaPage", value);
+		},
+		default: process.env.FIGMA_PAGE || config.figmaPage,
+		describe: "Name of tokens page on Figma",
+		required: false,
+		string: true
+	}).argv;
+if (
+	(!process.env.FIGMA_URL && !config.figmaUrl) ||
+	(!process.env.FIGMA_TOKEN && !config.figmaToken)
+)
+	throw new Error(
+		"The environment variables 'FIGMA_URL' or 'FIGMA_TOKEN' not provided(s)"
+	);
 
 var commonjsGlobal =
 	typeof globalThis !== "undefined"
@@ -1270,63 +1356,69 @@ var kebabCase = _createCompounder(function(result, word, index) {
 
 var kebabCase_1 = kebabCase;
 
-var writeFile = function(file, path, name, isToken, format) {
+var createFolder = function(directory) {
+	if (!directory)
+		throw new Error("No directory specified for createFolder()!");
+	if (!fs.existsSync(directory)) fs.mkdirSync(directory);
+};
+
+var format$1 = config.format;
+var writeFile = function(file, path, name, isToken) {
 	if (isToken === void 0) {
 		isToken = false;
-	}
-	if (format === void 0) {
-		format = "js";
 	}
 	if (!file || !path || !name)
 		throw new Error(
 			"Missing required parameters to correctly run writeFile()!"
 		);
 	createFolder(path);
-	write(file, path, name, isToken, format);
+	write(file, path, name, isToken);
 };
-var write = function(file, path, name, isToken, format) {
+var writeDeclarations = function(file, name, filePath) {
+	fs.writeFile(
+		filePath.replace("." + format$1, ".d.ts"),
+		"export default " +
+			camelCase_1(name) +
+			";\n\ndeclare const " +
+			camelCase_1(name) +
+			': {\n\t"' +
+			Object.keys(file).join('": string;\n	"') +
+			'": string;\n};\n',
+		"utf-8",
+		function(error) {
+			if (error)
+				throw new Error(
+					"Error in write TypeScript .d.ts file: " + error
+				);
+		}
+	);
+};
+var write = function(file, path, name, isToken) {
 	var fileContent = file;
 	var filePath = path + "/" + kebabCase_1(name);
 	if (isToken) {
-		if (format === "yml" || format === "yaml") {
-			fileContent = yaml.dump(file);
-		} else {
-			var camelCaseName = camelCase_1(name);
-			fileContent =
-				"const " +
-				camelCaseName +
-				" = " +
-				JSON.stringify(file, null, "	") +
-				"\n\nexport default " +
-				camelCaseName +
-				";";
-		}
+		var _camelCaseName = camelCase_1(name);
+		fileContent =
+			"const " +
+			_camelCaseName +
+			" = " +
+			JSON.stringify(file, null, "	") +
+			"\n\nexport default " +
+			_camelCaseName +
+			";";
 	}
-	filePath += "." + format;
+	filePath += "." + format$1;
 	fs.writeFile(filePath, fileContent, "utf-8", function(error) {
 		if (error) throw new Error("Error in write() > writeFile(): " + error);
 	});
-	if (typeof file === "object") {
-		fs.writeFile(
-			filePath.replace("." + format, ".d.ts"),
-			"export default " +
-				camelCase_1(name) +
-				";\ndeclare const " +
-				camelCase_1(name) +
-				': {\n\t"' +
-				Object.keys(file).join('": string;\n	"') +
-				'": string;\n};\n',
-			"utf-8",
-			function(error) {
-				if (error)
-					throw new Error(
-						"Error in write TypeScript .d.ts file: " + error
-					);
-			}
-		);
-	}
+	if (format$1 === "js" && typeof file === "object")
+		writeDeclarations(file, name, filePath);
 };
 
+var apiBaseUrl$1 = config.apiBaseUrl,
+	figmaJson$1 = config.figmaJson,
+	figmaUrl$1 = config.figmaUrl,
+	figmaToken$1 = config.figmaToken;
 var getFromApi = function() {
 	return __awaiter(void 0, void 0, void 0, function() {
 		var data, url;
@@ -1334,20 +1426,22 @@ var getFromApi = function() {
 			switch (_a.label) {
 				case 0:
 					data = {};
-					url =
-						"https://api.figma.com/v1/files/" +
-						process.env.FIGMA_URL;
+					url = apiBaseUrl$1 + figmaUrl$1;
 					return [
 						4 /*yield*/,
 						fetch(url, {
 							headers: {
-								"X-Figma-Token": process.env.FIGMA_TOKEN
+								"X-Figma-Token": figmaToken$1
 							}
 						})
 							.catch(function(error) {
 								throw new Error("Figma Error: " + error);
 							})
 							.then(function(response) {
+								if (response.status !== 200)
+									throw new Error(
+										"Error to get Figma metadata from API"
+									);
 								return response.json();
 							})
 							.then(function(json) {
@@ -1359,13 +1453,13 @@ var getFromApi = function() {
 											json.err
 									);
 								data = json;
-								writeFile(
-									JSON.stringify(json, undefined, 2),
-									"figma",
-									"figma",
-									false,
-									"json"
-								);
+								if (figmaJson$1)
+									writeFile(
+										JSON.stringify(json, undefined, 2),
+										"figma",
+										"figma",
+										false
+									);
 							})
 					];
 				case 1:
@@ -1374,41 +1468,6 @@ var getFromApi = function() {
 			}
 		});
 	});
-};
-
-var createPage = function(figmaPages) {
-	var _a, _b;
-	if (!figmaPages || !figmaPages.length)
-		throw new Error("No pages provided to createPage()!");
-	var targetPage =
-		((_b =
-			(_a = process.env.FIGMA_PAGE) === null || _a === void 0
-				? void 0
-				: _a
-						.trim()
-						.toLowerCase()
-						.replace(" ", "")),
-		_b !== null && _b !== void 0 ? _b : "designtokens");
-	var correctPage;
-	for (
-		var _i = 0, figmaPages_1 = figmaPages;
-		_i < figmaPages_1.length;
-		_i++
-	) {
-		var page = figmaPages_1[_i];
-		var fixedPageName = page.name.toLowerCase().replace(" ", "");
-		if (fixedPageName === targetPage) {
-			correctPage = page;
-			break;
-		}
-	}
-	return correctPage;
-};
-
-var roundToDecimal = function(value, decimals) {
-	if (!value) throw new Error("No number value provided to roundNumber()!");
-	if (!decimals) decimals = 0;
-	return Number(Math.round(Number(value + "e" + decimals)) + "e-" + decimals);
 };
 
 var recursiveSetup = function(children, processItem) {
@@ -1422,223 +1481,13 @@ var recursiveSetup = function(children, processItem) {
 	}
 };
 
-var setupColorTokens = function(frame, styles) {
-	if (!frame) throw new Error("No frame for setupColorTokens()!");
+var setupToken = function(token, page, styles) {
+	var frame = page.children.filter(function(frame) {
+		return kebabCase_1(frame.name) === kebabCase_1(token.frameName);
+	})[0];
+	if (!frame) throw new Error("No frame for setupToken()!");
 	if (!frame.children || !frame.children.length)
 		throw new Error('The frame "' + frame.name + "\" don't have children!");
-	var colors = {};
-	recursiveSetup(frame.children, function(color) {
-		var _a, _b, _c;
-		var colorR = Math.round(color.fills[0].color.r * 255);
-		var colorG = Math.round(color.fills[0].color.g * 255);
-		var colorB = Math.round(color.fills[0].color.b * 255);
-		var colorA = roundToDecimal(color.fills[0].color.a * 1, 3);
-		var token =
-			"rgba(" +
-			colorR +
-			", " +
-			colorG +
-			", " +
-			colorB +
-			", " +
-			colorA +
-			")";
-		var name = kebabCase_1(
-			((_c =
-				(_b =
-					styles[
-						(_a = color.styles) === null || _a === void 0
-							? void 0
-							: _a.fill
-					]) === null || _b === void 0
-					? void 0
-					: _b.name),
-			_c !== null && _c !== void 0 ? _c : color.name)
-		);
-		colors[name] = token;
-	});
-	return colors;
-};
-
-var SIZES_PX = 1;
-var SIZES_REM = 16;
-
-var normalizeUnits = function(value, currentUnit, newUnit) {
-	if (!value || !currentUnit || !newUnit)
-		throw new Error("Missing parameters for normalizeUnits()!");
-	var rootSize;
-	var unitSize;
-	if (currentUnit === "px") rootSize = SIZES_PX;
-	if (currentUnit === "percent") rootSize = SIZES_PX;
-	if (newUnit === "rem" || newUnit === "em") unitSize = SIZES_REM;
-	if (newUnit === "unitless") unitSize = value / 100;
-	if (rootSize && unitSize) {
-		if (newUnit === "unitless") return String(unitSize);
-		var adjustedValue = value * (rootSize / unitSize);
-		return "" + adjustedValue + newUnit;
-	}
-	throw new Error(
-		"normalizeUnits(): rootSize and/or unitSize variables are either undefined or not incoming as px values."
-	);
-};
-
-var setupSpacingTokens = function(frame) {
-	if (!frame) throw new Error("No frame for setupSpacingTokens()!");
-	if (!frame.children || !frame.children.length)
-		throw new Error('The frame "' + frame.name + "\" don't have children!");
-	var spacings = {};
-	recursiveSetup(frame.children, function(spacing) {
-		if (spacing.type !== "RECTANGLE") return;
-		var token = normalizeUnits(
-			spacing.absoluteBoundingBox.width,
-			"px",
-			"rem"
-		);
-		var name = kebabCase_1(spacing.name);
-		spacings[name] = token;
-	});
-	return spacings;
-};
-
-var setupFontTokens = function(frame) {
-	if (!frame) throw new Error("No frame for setupFontTokens()!");
-	if (!frame.children || !frame.children.length)
-		throw new Error('The frame "' + frame.name + "\" don't have children!");
-	var fonts = {};
-	recursiveSetup(frame.children, function(font) {
-		var token = {
-			name: font.style.fontFamily,
-			"post-script": font.style.fontPostScriptName
-		};
-		var name = kebabCase_1(font.name);
-		fonts[name] = token;
-	});
-	return fonts;
-};
-
-var setupFontSizeTokens = function(frame) {
-	if (!frame) throw new Error("No frame for setupFontSizeTokens()!");
-	if (!frame.children || !frame.children.length)
-		throw new Error('The frame "' + frame.name + "\" don't have children!");
-	var fontSizes = {};
-	recursiveSetup(frame.children, function(fontSize) {
-		var token = normalizeUnits(fontSize.style.fontSize, "px", "rem");
-		var name = kebabCase_1(fontSize.name);
-		fontSizes[name] = token;
-	});
-	return fontSizes;
-};
-
-var setupFontWeightTokens = function(frame) {
-	if (!frame) throw new Error("No frame for setupFontWeightTokens()!");
-	if (!frame.children || !frame.children.length)
-		throw new Error('The frame "' + frame.name + "\" don't have children!");
-	var fontWeights = {};
-	recursiveSetup(frame.children, function(fontWeight) {
-		var token = fontWeight.style.fontWeight;
-		var name = kebabCase_1(fontWeight.name);
-		fontWeights[name] = token;
-	});
-	return fontWeights;
-};
-
-var setupLineHeightTokens = function(frame) {
-	if (!frame) throw new Error("No frame for setupLineHeightTokens()!");
-	if (!frame.children || !frame.children.length)
-		throw new Error('The frame "' + frame.name + "\" don't have children!");
-	var lineHeights = {};
-	recursiveSetup(frame.children, function(lineHeight) {
-		var token = normalizeUnits(lineHeight.style.lineHeightPx, "px", "rem");
-		var name = kebabCase_1(lineHeight.name);
-		lineHeights[name] = token;
-	});
-	return lineHeights;
-};
-
-var setupRadiusTokens = function(frame) {
-	if (!frame) throw new Error("No frame for setupRadiusTokens()!");
-	if (!frame.children || !frame.children.length)
-		throw new Error('The frame "' + frame.name + "\" don't have children!");
-	var radii = {};
-	recursiveSetup(frame.children, function(radius) {
-		if (radius.type !== "RECTANGLE") return;
-		var token;
-		if (radius.rectangleCornerRadii) {
-			token = radius.rectangleCornerRadii
-				.map(function(radius) {
-					return radius + "px";
-				})
-				.join(" ");
-		} else if (radius.cornerRadius) {
-			token = radius.cornerRadius + "px";
-		} else {
-			token = "0";
-		}
-		var name = kebabCase_1(radius.name);
-		radii[name] = token;
-	});
-	return radii;
-};
-
-var setupBorderTokens = function(frame) {
-	if (!frame) throw new Error("No frame for setupBorderTokens()!");
-	if (!frame.children || !frame.children.length)
-		throw new Error('The frame "' + frame.name + "\" don't have children!");
-	var borders = {};
-	recursiveSetup(frame.children, function(border) {
-		var token = border.strokeWeight + "px " + border.strokes[0].type;
-		var name = kebabCase_1(border.name);
-		borders[name] = token;
-	});
-	return borders;
-};
-
-var setupShadowTokens = function(frame, styles) {
-	if (!frame) throw new Error("No frame for setupShadowTokens()!");
-	if (!frame.children || !frame.children.length)
-		throw new Error('The frame "' + frame.name + "\" don't have children!");
-	var shadows = {};
-	recursiveSetup(frame.children, function(shadow) {
-		var _a, _b, _c;
-		var shadowOffsetX = shadow.effects[0].offset.x + "px ";
-		var shadowOffsetY = shadow.effects[0].offset.y + "px ";
-		var shadowRadius = shadow.effects[0].radius + "px ";
-		var shadowColorR = Math.round(shadow.effects[0].color.r * 255);
-		var shadowColorG = Math.round(shadow.effects[0].color.g * 255);
-		var shadowColorB = Math.round(shadow.effects[0].color.b * 255);
-		var shadowColorA = roundToDecimal(shadow.effects[0].color.a * 1, 3);
-		var shadowColor =
-			"rgba(" +
-			shadowColorR +
-			", " +
-			shadowColorG +
-			", " +
-			shadowColorB +
-			", " +
-			shadowColorA +
-			")";
-		var token = shadowOffsetX + shadowOffsetY + shadowRadius + shadowColor;
-		var name = kebabCase_1(
-			((_c =
-				(_b =
-					styles[
-						(_a = shadow.styles) === null || _a === void 0
-							? void 0
-							: _a.effect
-					]) === null || _b === void 0
-					? void 0
-					: _b.name),
-			_c !== null && _c !== void 0 ? _c : shadow.name)
-		);
-		shadows[name] = token;
-	});
-	return shadows;
-};
-
-var setupAnimationTokens = function(frame) {
-	if (!frame) throw new Error("No frame for setupAnimationTokens()!");
-	if (!frame.children || !frame.children.length)
-		throw Error('The frame "' + frame.name + "\" don't have children!");
 	var animations = {};
 	recursiveSetup(frame.children, function(animation) {
 		var token = animation.absoluteBoundingBox.width + "ms";
@@ -1648,172 +1497,57 @@ var setupAnimationTokens = function(frame) {
 	return animations;
 };
 
-var setupMixinTokens = function(frame) {
-	if (!frame) throw new Error("No frame for setupMixinTokens()!");
-	if (!frame.children || !frame.children.length)
-		throw new Error('The frame "' + frame.name + "\" don't have children!");
-	var mixins = {};
-	for (var _i = 0, _a = frame.children; _i < _a.length; _i++) {
-		var mixin = _a[_i];
-		if (mixin.type !== "GROUP" || !mixin.children) continue;
-		var token = mixin.children[0].characters;
-		var name_1 = kebabCase_1(mixin.name);
-		mixins[name_1] = token;
-	}
-	return mixins;
-};
-
-var setupGridTokens = function(frame) {
-	if (!frame) throw new Error("No frame for setupGridTokens()!");
-	if (!frame.children || !frame.children.length)
-		throw new Error('The frame "' + frame.name + "\" don't have children!");
-	if (frame.name.toLowerCase().match("module")) return;
-	var grid = {
-		"column-count": 1,
-		"column-width": "100%",
-		gutter: "0%",
-		"min-width": "0px"
-	};
-	grid["column-count"] = frame.children.length;
-	var columnWidth = frame.children[0].absoluteBoundingBox.width;
-	var canvasWidth = frame.absoluteBoundingBox.width;
-	grid["column-width"] = (columnWidth / canvasWidth) * 100 + "%";
-	grid.gutter =
-		((frame.children[1].absoluteBoundingBox.x -
-			(frame.children[0].absoluteBoundingBox.x + columnWidth)) /
-			canvasWidth) *
-			100 +
-		"%";
-	grid["min-width"] = canvasWidth + "px";
-	return grid;
-};
-
-var processTokens = function(sheet, name, styles) {
-	if (!sheet || !name)
-		throw new Error("No sheet or name for processTokens()!");
-	var loweredName = name.toLowerCase();
-	try {
-		switch (true) {
-			case !!loweredName.match("animations?"):
-				return setupAnimationTokens(sheet);
-			case !!loweredName.match("borders?"):
-				return setupBorderTokens(sheet);
-			case !!loweredName.match("colou?rs?"):
-				return setupColorTokens(sheet, styles);
-			case !!loweredName.match("grids?"):
-				return setupGridTokens(sheet);
-			case !!loweredName.match("fontsizes?"):
-				return setupFontSizeTokens(sheet);
-			case !!loweredName.match("fontfamil(y|ies)"):
-				return setupFontTokens(sheet);
-			case !!loweredName.match("fontweights?"):
-				return setupFontWeightTokens(sheet);
-			case !!loweredName.match("(font)?lineheights?"):
-				return setupLineHeightTokens(sheet);
-			case !!loweredName.match("mixins?|tim(e|ings?)"):
-				return setupMixinTokens(sheet);
-			case !!loweredName.match("radi(i|us)"):
-				return setupRadiusTokens(sheet);
-			case !!loweredName.match("shadows?"):
-				return setupShadowTokens(sheet, styles);
-			case !!loweredName.match("spac(es?|ings?)"):
-				return setupSpacingTokens(sheet);
+var figmaPage$1 = config.figmaPage;
+var tokensPage = function(figmaPages) {
+	if (!figmaPages || !figmaPages.length)
+		throw new Error("No pages provided to tokensPage()!");
+	var targetPage = kebabCase_1(figmaPage$1);
+	var correctPage;
+	for (
+		var _i = 0, figmaPages_1 = figmaPages;
+		_i < figmaPages_1.length;
+		_i++
+	) {
+		var page = figmaPages_1[_i];
+		if (kebabCase_1(page.name) === targetPage) {
+			correctPage = page;
+			break;
 		}
-	} catch (error) {
-		console.error(error);
 	}
+	return correctPage;
 };
 
-var writeTokens = function(tokens, format, styles) {
-	if (!tokens || !tokens.length)
+var format$2 = config.format,
+	tokens$1 = config.tokens;
+var writeTokens = function(data) {
+	if (!tokens$1 || !tokens$1.length)
 		throw new Error("Less than one token provided to writeTokens()!");
-	for (var _i = 0, tokens_1 = tokens; _i < tokens_1.length; _i++) {
+	for (var _i = 0, tokens_1 = tokens$1; _i < tokens_1.length; _i++) {
 		var token = tokens_1[_i];
-		var processedToken = processTokens(token, token.name, styles);
+		var processedToken = setupToken(
+			token,
+			tokensPage(data.document.children),
+			data.styles
+		);
 		if (processedToken)
-			writeFile(processedToken, "tokens", token.name, true, format);
+			writeFile(processedToken, "tokens", token.name, true);
 	}
 };
 
-dotenv.config();
-if (!process.env.FIGMA_URL || !process.env.FIGMA_TOKEN)
-	throw new Error(
-		"The environment variables 'FIGMA_URL' or 'FIGMA_TOKEN' not provided(s)"
-	);
-var config = defaultConfig;
-var coerce = function(key, value) {
-	var _a;
-	config = __assign(__assign({}, config), ((_a = {}), (_a[key] = value), _a));
-	return value;
-};
-argv.alias({ help: "h", version: "v" })
-	.option("format", {
-		alias: "f",
-		coerce: function(value) {
-			return coerce("format", value);
-		},
-		choices: ["css", "js", "json", "sass", "scss"],
-		default: "js",
-		describe: "Choose a output format"
-	})
-	.option("config-file", {
-		alias: "c",
-		boolean: true,
-		coerce: function(configFile) {
-			if (configFile) {
-				config = __assign(
-					__assign({}, config),
-					JSON.parse(fs.readFileSync(".figmagic.json", "utf8"))
-				);
-			}
-			return configFile;
-		},
-		default: false,
-		describe: "Extend and modify the default config file: .figmagic.json"
-	})
-	.option("figma-url", {
-		alias: "u",
-		coerce: function(value) {
-			return coerce("figmaUrl", value);
-		},
-		default: process.env.FIGMA_URL,
-		required: false,
-		string: true
-	})
-	.option("figma-token", {
-		alias: "t",
-		coerce: function(value) {
-			return coerce("figmaToken", value);
-		},
-		default: process.env.FIGMA_TOKEN,
-		required: false,
-		string: true
-	})
-	.option("figma-page", {
-		alias: "p",
-		coerce: function(value) {
-			return coerce("figmaPage", value);
-		},
-		default: process.env.FIGMA_PAGE || "Design Tokens",
-		required: false,
-		string: true
-	});
 (function() {
 	return __awaiter(void 0, void 0, void 0, function() {
-		var data, tokens, styles;
+		var data;
 		return __generator(this, function(_a) {
 			switch (_a.label) {
 				case 0:
 					rimraf("./tokens", function() {});
 					rimraf("./figma", function() {});
-					createFolder("tokens");
-					createFolder("figma");
 					return [4 /*yield*/, getFromApi()];
 				case 1:
 					data = _a.sent();
-					tokens = createPage(data.document.children);
-					styles = data.styles;
-					writeTokens(tokens.children, config.format, styles);
+					// const tokens = createPage(data.document.children);
+					// const styles = data.styles;
+					writeTokens(data);
 					return [2 /*return*/];
 			}
 		});

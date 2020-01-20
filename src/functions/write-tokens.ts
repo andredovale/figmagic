@@ -1,18 +1,25 @@
-import camelCase from "lodash/camelCase";
-import { processTokens } from "./process-tokens";
-import { writeFile } from "./write-file";
+import { config } from "../config";
 import { Frame } from "../types/frame";
+// import { processTokens } from "./process-tokens";
+import { setupToken } from "./setup-token";
+import { writeFile } from "./write-file";
+import { tokensPage } from "./tokens-page";
 
-export const writeTokens = (
-	tokens: Frame[],
-	format: string,
-	styles: { [key: string]: { name: string } }
-) => {
+const { format, tokens } = config;
+
+type Json = { err?: string; status?: string; [key: string]: any };
+
+export const writeTokens = (data: Json) => {
 	if (!tokens || !tokens.length)
 		throw new Error("Less than one token provided to writeTokens()!");
 
 	for (let token of tokens) {
-		const processedToken = processTokens(token, token.name, styles);
+		const processedToken = setupToken(
+			token,
+			tokensPage(data.document.children),
+			data.styles
+		);
+
 		if (processedToken)
 			writeFile(processedToken, "tokens", token.name, true, format);
 	}

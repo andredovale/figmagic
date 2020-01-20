@@ -1,7 +1,22 @@
 {
-	"lorem": "ipsum",
-	"dolor": true,
-	"sit": false,
-	"amet": 123,
-	"et": ["lament", true, false, 456]
+	"figmaUrl": "",
+	"figmaToken": "",
+	"figmaPage": "Design Tokens",
+	"format": "js",
+	"apiBaseUrl": "https://api.figma.com/v1/files/",
+	"figmaJson": false,
+	"figmaTokens": true,
+	"outputColorFormat": "rgba",
+	"outputCSSUnit": "em",
+	"outputNameFormat": "kebab",
+	"recursive": true,
+	"tokens": [
+		{
+			"frameName": "time",
+			"name": "animation",
+			"outputNameFormat": "snake",
+			"path": "absoluteBoundingBox.width",
+			"postfix": "ms"
+		}
+	]
 }

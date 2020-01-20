@@ -6,7 +6,7 @@ export const setupAnimationTokens = (frame: Frame) => {
 	if (!frame) throw new Error("No frame for setupAnimationTokens()!");
 
 	if (!frame.children || !frame.children.length)
-		throw Error(`The frame "${frame.name}" don't have children!`);
+		throw new Error(`The frame "${frame.name}" don't have children!`);
 
 	const animations: { [key: string]: string } = {};
 

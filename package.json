@@ -10,7 +10,7 @@
 		"salesforce theo"
 	],
 	"homepage": "https://www.figmagic.com",
-	"version": "1.0.21",
+	"version": "1.0.22",
 	"author": "Mikael Vesavuori",
 	"main": "dist/index.js",
 	"license": "MIT",
@@ -21,7 +21,7 @@
 		"@types/lodash": "^4.14.149",
 		"@types/node-fetch": "^2.5.4",
 		"@types/rimraf": "^2.0.3",
-		"husky": "^4.0.9",
+		"husky": "^4.0.10",
 		"jest": "^24.1.0",
 		"prettier": "^1.16.4",
 		"pretty-quick": "^2.0.1",
@@ -30,7 +30,7 @@
 		"rollup-plugin-node-resolve": "^5.2.0",
 		"rollup-plugin-typescript2": "^0.25.3",
 		"ts-jest": "^24.3.0",
-		"typescript": "^3.7.4"
+		"typescript": "^3.7.5"
 	},
 	"dependencies": {
 		"dotenv": "^8.2.0",
@@ -38,7 +38,7 @@
 		"lodash": "^4.17.15",
 		"node-fetch": "^2.3.0",
 		"rimraf": "^3.0.0",
-		"yargs": "^15.0.0"
+		"yargs": "^15.1.0"
 	},
 	"bin": {
 		"figmagic": "./dist/index.js"
@@ -47,7 +47,11 @@
 		"build": "rollup -c && chmod u+x dist/index.js",
 		"setup": "rm -rf yarn.lock node_modules/ /usr/local/lib/node_modules/figmagic && npm install -g",
 		"figmagic": "node ./dist/index",
-		"test": "npx jest",
-		"precommit": "echo Running pre-commit linting... && yarn test -o && pretty-quick --staged && npm --no-git-tag-version version patch && git add package.json"
+		"test": "npx jest"
+	},
+	"husky": {
+		"hooks": {
+			"pre-commit": "echo Running pre-commit linting... && yarn test -o && pretty-quick --staged && npm --no-git-tag-version version patch && git add package.json"
+		}
 	}
 }
