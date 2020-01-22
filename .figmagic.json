@@ -9,14 +9,28 @@
 	"outputColorFormat": "rgba",
 	"outputCSSUnit": "em",
 	"outputNameFormat": "kebab",
-	"recursive": true,
 	"tokens": [
 		{
 			"frameName": "time",
+			"group": true,
 			"name": "animation",
-			"outputNameFormat": "snake",
-			"path": "absoluteBoundingBox.width",
-			"postfix": "ms"
+			"path": "characters"
+		},
+		{
+			"frameName": "colors",
+			"name": "color",
+			"path": "fills[0].color",
+			"style": true,
+			"styleKey": "fill",
+			"processValue": "color"
+		},
+		{
+			"frameName": "shadows",
+			"name": "shadow",
+			"path": "effects[0]",
+			"style": true,
+			"styleKey": "effect",
+			"processValue": "shadow"
 		}
 	]
 }

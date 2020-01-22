@@ -7,7 +7,7 @@ import { Config } from "./types/config.js";
 
 dotenv.config();
 
-let config = defaultConfig as Config;
+let config = (defaultConfig as unknown) as Config;
 
 const coerce = (key: string, value: string) => {
 	config = {
@@ -76,6 +76,6 @@ if (
 		"The environment variables 'FIGMA_URL' or 'FIGMA_TOKEN' not provided(s)"
 	);
 
-// console.log("TCL: config", config);
+console.log("TCL: config", config);
 
 export { config };

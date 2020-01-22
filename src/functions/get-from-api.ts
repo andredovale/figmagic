@@ -39,8 +39,7 @@ export const getFromApi = async () => {
 					JSON.stringify(json, undefined, 2),
 					"figma",
 					"figma",
-					false,
-					"json"
+					false
 				);
 		});
 

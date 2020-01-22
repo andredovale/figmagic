@@ -5,7 +5,7 @@ import { setupToken } from "./setup-token";
 import { writeFile } from "./write-file";
 import { tokensPage } from "./tokens-page";
 
-const { format, tokens } = config;
+const { tokens } = config;
 
 type Json = { err?: string; status?: string; [key: string]: any };
 
@@ -21,6 +21,6 @@ export const writeTokens = (data: Json) => {
 		);
 
 		if (processedToken)
-			writeFile(processedToken, "tokens", token.name, true, format);
+			writeFile(processedToken, "tokens", token.name, true);
 	}
 };
