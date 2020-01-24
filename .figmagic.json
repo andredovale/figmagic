@@ -25,12 +25,45 @@
 			"processValue": "color"
 		},
 		{
+			"frameName": "mixins",
+			"group": true,
+			"name": "mixin",
+			"path": "characters"
+		},
+		{
+			"frameName": "radius",
+			"name": "radius",
+			"path": "rectangleCornerRadii",
+			"processValue": "radius",
+			"suffix": "px",
+			"type": "rectangle",
+			"fallback": "0"
+		},
+		{
 			"frameName": "shadows",
 			"name": "shadow",
 			"path": "effects[0]",
 			"style": true,
 			"styleKey": "effect",
 			"processValue": "shadow"
+		},
+		{
+			"frameName": "space",
+			"group": true,
+			"name": "spacing",
+			"path": "absoluteBoundingBox.width",
+			"suffix": "px"
+		},
+		{
+			"frameName": [
+				"grid-desktop",
+				"grid-notebook-small",
+				"grid-tablet",
+				"grid-smartphone"
+			],
+			"name": "grid",
+			"path": "children",
+			"processValue": "grid"
 		}
 	]
 }

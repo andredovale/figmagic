@@ -197,12 +197,45 @@ var tokens = [
 		processValue: "color"
 	},
 	{
+		frameName: "mixins",
+		group: true,
+		name: "mixin",
+		path: "characters"
+	},
+	{
+		frameName: "radius",
+		name: "radius",
+		path: "rectangleCornerRadii",
+		processValue: "radius",
+		suffix: "px",
+		type: "rectangle",
+		fallback: "0"
+	},
+	{
 		frameName: "shadows",
 		name: "shadow",
 		path: "effects[0]",
 		style: true,
 		styleKey: "effect",
 		processValue: "shadow"
+	},
+	{
+		frameName: "space",
+		group: true,
+		name: "spacing",
+		path: "absoluteBoundingBox.width",
+		suffix: "px"
+	},
+	{
+		frameName: [
+			"grid-desktop",
+			"grid-notebook-small",
+			"grid-tablet",
+			"grid-smartphone"
+		],
+		name: "grid",
+		path: "children",
+		processValue: "grid"
 	}
 ];
 var defaultConfig = {
@@ -289,7 +322,6 @@ if (
 	throw new Error(
 		"The environment variables 'FIGMA_URL' or 'FIGMA_TOKEN' not provided(s)"
 	);
-console.log("TCL: config", config);
 
 var commonjsGlobal =
 	typeof globalThis !== "undefined"
@@ -2535,13 +2567,16 @@ var roundToDecimal = function(value, decimals) {
 	return Number(Math.round(Number(value + "e" + decimals)) + "e-" + decimals);
 };
 
-var processToken = function(value, processValue) {
-	if (!value || !processValue)
-		throw new Error(
-			"Value or ProcessValue don't provided to processToken()!"
-		);
+var processToken = function(value, token, frame) {
+	if (!value && !token.fallback)
+		throw new Error("Value or Fallback don't provided to processToken()!");
 	var processedToken;
-	switch (processValue) {
+	if (!value && token.fallback) {
+		processedToken =
+			"" + (token.prefix || "") + token.fallback + (token.suffix || "");
+		return processedToken;
+	}
+	switch (token.processValue) {
 		case "color":
 			var colorR = Math.round(value.r * 255);
 			var colorG = Math.round(value.g * 255);
@@ -2557,6 +2592,38 @@ var processToken = function(value, processValue) {
 				", " +
 				colorA +
 				")";
+			break;
+		case "grid":
+			var grid = {
+				"column-count": 1,
+				"column-width": "100%",
+				gutter: "0%",
+				"min-width": "0px"
+			};
+			grid["column-count"] = value.length;
+			var columnWidth = value[0].absoluteBoundingBox.width;
+			var canvasWidth = frame.absoluteBoundingBox.width;
+			grid["column-width"] = (columnWidth / canvasWidth) * 100 + "%";
+			grid.gutter =
+				((value[1].absoluteBoundingBox.x -
+					(value[0].absoluteBoundingBox.x + columnWidth)) /
+					canvasWidth) *
+					100 +
+				"%";
+			grid["min-width"] = canvasWidth + "px";
+			processedToken = grid;
+			break;
+		case "radius":
+			processedToken = value
+				.map(function(radius) {
+					return (
+						"" +
+						(token.prefix || "") +
+						radius +
+						(token.suffix || "")
+					);
+				})
+				.join(" ");
 			break;
 		case "shadow":
 			var shadowOffsetX = value.offset.x + "px ";
@@ -2596,19 +2663,17 @@ var parseStringFormat = {
 	upper: upperCase_1
 };
 var setupToken = function(token, page, styles) {
-	var frame = page.children.filter(function(frame) {
-		return kebabCase_1(frame.name) === kebabCase_1(token.frameName);
-	})[0];
-	if (!frame) throw new Error("No frame for setupToken()!");
-	if (!frame.children || !frame.children.length)
-		throw new Error('The frame "' + frame.name + "\" don't have children!");
 	var tokens = {};
 	var buildToken = function(currentFrame, name) {
+		if (token.type && kebabCase_1(currentFrame.type) !== token.type) return;
 		if (token.style && !token.styleKey)
 			throw new Error("styleKey don't founded");
 		var key = name || get_1(currentFrame, token.path);
 		if (token.style) {
 			key = styles[get_1(currentFrame, "styles." + token.styleKey)].name;
+		}
+		if (typeof key !== "string") {
+			key = currentFrame.name;
 		}
 		var parsedKey = parseStringFormat[
 			token.outputNameFormat || outputNameFormat$1
@@ -2616,36 +2681,80 @@ var setupToken = function(token, page, styles) {
 		if (token.processValue) {
 			tokens[parsedKey] = processToken(
 				get_1(currentFrame, token.path),
-				token.processValue
+				token,
+				currentFrame
 			);
-		} else {
+		} else if (!token.processValue) {
 			tokens[parsedKey] =
+				"" +
 				(token.prefix || "") +
-				String(get_1(currentFrame, token.path)) +
+				get_1(currentFrame, token.path) +
 				(token.suffix || "");
 		}
 	};
-	for (var _i = 0, _a = frame.children; _i < _a.length; _i++) {
-		var currentFrame = _a[_i];
-		if (token.group && currentFrame.type === "GROUP") {
-			for (var _b = 0, _c = currentFrame.children; _b < _c.length; _b++) {
-				var currentGroupFrame = _c[_b];
-				buildToken(currentGroupFrame, currentFrame.name);
-			}
-		} else if (!token.group) {
-			if (currentFrame.children) {
+	var processFrame = function(frame) {
+		if (!frame.children || !frame.children.length)
+			throw new Error(
+				'The frame "' + frame.name + "\" don't have children!"
+			);
+		var recursive = function(currentFrame) {
+			if (token.group && currentFrame.type === "GROUP") {
 				for (
-					var _d = 0, _e = currentFrame.children;
-					_d < _e.length;
-					_d++
+					var _i = 0, _a = currentFrame.children;
+					_i < _a.length;
+					_i++
 				) {
-					var currentGroupFrame = _e[_d];
+					var currentGroupFrame = _a[_i];
 					buildToken(currentGroupFrame, currentFrame.name);
 				}
-				continue;
+			} else if (!token.group) {
+				if (currentFrame.children && token.path !== "children") {
+					for (
+						var _b = 0, _c = currentFrame.children;
+						_b < _c.length;
+						_b++
+					) {
+						var currentGroupFrame = _c[_b];
+						buildToken(currentGroupFrame, currentFrame.name);
+					}
+					return;
+				}
+				buildToken(currentFrame);
 			}
-			buildToken(currentFrame);
+		};
+		if (token.path !== "children") {
+			for (var _i = 0, _a = frame.children; _i < _a.length; _i++) {
+				var currentFrame = _a[_i];
+				recursive(currentFrame);
+			}
+		} else {
+			recursive(frame);
 		}
+	};
+	if (Array.isArray(token.frameName)) {
+		var frames_2 = [];
+		var _loop_1 = function(frameName) {
+			frames_2.push(
+				page.children.filter(function(frame) {
+					return kebabCase_1(frame.name) === kebabCase_1(frameName);
+				})[0]
+			);
+		};
+		for (var _i = 0, _a = token.frameName; _i < _a.length; _i++) {
+			var frameName = _a[_i];
+			_loop_1(frameName);
+		}
+		if (!frames_2.length) throw new Error("No frame for setupToken()!");
+		for (var _b = 0, frames_1 = frames_2; _b < frames_1.length; _b++) {
+			var frame = frames_1[_b];
+			processFrame(frame);
+		}
+	} else {
+		var frame = page.children.filter(function(frame) {
+			return kebabCase_1(frame.name) === kebabCase_1(token.frameName);
+		})[0];
+		if (!frame) throw new Error("No frame for setupToken()!");
+		processFrame(frame);
 	}
 	return tokens;
 };

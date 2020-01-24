@@ -1,18 +1,22 @@
 import { Config } from "../types/config";
 import { roundToDecimal } from "./round-to-decimal";
+import { Frame } from "../types/frame";
 
-const processToken = (
-	value: any,
-	processValue: Config["tokens"][0]["processValue"]
-) => {
-	if (!value || !processValue)
-		throw new Error(
-			"Value or ProcessValue don't provided to processToken()!"
-		);
+const processToken = (value: any, token: Config["tokens"][0], frame: Frame) => {
+	if (!value && !token.fallback)
+		throw new Error("Value or Fallback don't provided to processToken()!");
 
 	let processedToken;
 
-	switch (processValue) {
+	if (!value && token.fallback) {
+		processedToken = `${token.prefix || ""}${
+			token.fallback
+		}${token.suffix || ""}`;
+
+		return processedToken;
+	}
+
+	switch (token.processValue) {
 		case "color":
 			const colorR = Math.round(value.r * 255);
 			const colorG = Math.round(value.g * 255);
@@ -20,6 +24,46 @@ const processToken = (
 			const colorA = roundToDecimal(value.a * 1, 3);
 
 			processedToken = `rgba(${colorR}, ${colorG}, ${colorB}, ${colorA})`;
+			break;
+
+		case "grid":
+			const grid: {
+				"column-count": number;
+				"column-width": string;
+				gutter: string;
+				"min-width": string;
+			} = {
+				"column-count": 1,
+				"column-width": "100%",
+				gutter: "0%",
+				"min-width": "0px"
+			};
+
+			grid["column-count"] = value.length;
+
+			const columnWidth = value[0].absoluteBoundingBox.width;
+			const canvasWidth = frame.absoluteBoundingBox.width;
+
+			grid["column-width"] = `${(columnWidth / canvasWidth) * 100}%`;
+
+			grid.gutter = `${((value[1].absoluteBoundingBox.x -
+				(value[0].absoluteBoundingBox.x + columnWidth)) /
+				canvasWidth) *
+				100}%`;
+
+			grid["min-width"] = `${canvasWidth}px`;
+
+			processedToken = grid;
+
+			break;
+
+		case "radius":
+			processedToken = (value as string[])
+				.map(
+					radius =>
+						`${token.prefix || ""}${radius}${token.suffix || ""}`
+				)
+				.join(" ");
 			break;
 
 		case "shadow":

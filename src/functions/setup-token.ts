@@ -26,18 +26,11 @@ export const setupToken = (
 	page: Page,
 	styles: { [key: string]: { name: string } }
 ) => {
-	const frame = page.children.filter(
-		frame => _kebabCase(frame.name) === _kebabCase(token.frameName)
-	)[0];
-
-	if (!frame) throw new Error("No frame for setupToken()!");
-
-	if (!frame.children || !frame.children.length)
-		throw new Error(`The frame "${frame.name}" don't have children!`);
-
-	const tokens: { [key: string]: string } = {};
+	const tokens: { [key: string]: string | {} } = {};
 
 	const buildToken = (currentFrame: Frame, name?: string) => {
+		if (token.type && _kebabCase(currentFrame.type) !== token.type) return;
+
 		if (token.style && !token.styleKey)
 			throw new Error("styleKey don't founded");
 
@@ -47,6 +40,10 @@ export const setupToken = (
 			key = styles[_get(currentFrame, `styles.${token.styleKey}`)].name;
 		}
 
+		if (typeof key !== "string") {
+			key = currentFrame.name;
+		}
+
 		const parsedKey = parseStringFormat[
 			token.outputNameFormat || outputNameFormat
 		](key);
@@ -54,31 +51,73 @@ export const setupToken = (
 		if (token.processValue) {
 			tokens[parsedKey] = processToken(
 				_get(currentFrame, token.path),
-				token.processValue
+				token,
+				currentFrame
 			);
-		} else {
-			tokens[parsedKey] =
-				(token.prefix || "") +
-				String(_get(currentFrame, token.path)) +
-				(token.suffix || "");
+		} else if (!token.processValue) {
+			tokens[parsedKey] = `${token.prefix || ""}${_get(
+				currentFrame,
+				token.path
+			)}${token.suffix || ""}`;
 		}
 	};
 
-	for (const currentFrame of frame.children) {
-		if (token.group && currentFrame.type === "GROUP") {
-			for (const currentGroupFrame of (currentFrame as Page).children) {
-				buildToken(currentGroupFrame, currentFrame.name);
-			}
-		} else if (!token.group) {
-			if (currentFrame.children) {
+	const processFrame = (frame: Frame) => {
+		if (!frame.children || !frame.children.length)
+			throw new Error(`The frame "${frame.name}" don't have children!`);
+
+		const recursive = (currentFrame: Frame) => {
+			if (token.group && currentFrame.type === "GROUP") {
 				for (const currentGroupFrame of (currentFrame as Page)
 					.children) {
 					buildToken(currentGroupFrame, currentFrame.name);
 				}
-				continue;
+			} else if (!token.group) {
+				if (currentFrame.children && token.path !== "children") {
+					for (const currentGroupFrame of (currentFrame as Page)
+						.children) {
+						buildToken(currentGroupFrame, currentFrame.name);
+					}
+					return;
+				}
+				buildToken(currentFrame);
 			}
-			buildToken(currentFrame);
+		};
+
+		if (token.path !== "children") {
+			for (const currentFrame of frame.children) {
+				recursive(currentFrame);
+			}
+		} else {
+			recursive(frame);
 		}
+	};
+
+	if (Array.isArray(token.frameName)) {
+		let frames: Frame[] = [];
+
+		for (const frameName of token.frameName) {
+			frames.push(
+				page.children.filter(
+					frame => _kebabCase(frame.name) === _kebabCase(frameName)
+				)[0]
+			);
+		}
+
+		if (!frames.length) throw new Error("No frame for setupToken()!");
+
+		for (const frame of frames) {
+			processFrame(frame);
+		}
+	} else {
+		const frame = page.children.filter(
+			frame =>
+				_kebabCase(frame.name) === _kebabCase(token.frameName as string)
+		)[0];
+
+		if (!frame) throw new Error("No frame for setupToken()!");
+
+		processFrame(frame);
 	}
 
 	return tokens;

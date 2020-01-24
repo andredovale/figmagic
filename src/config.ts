@@ -76,6 +76,4 @@ if (
 		"The environment variables 'FIGMA_URL' or 'FIGMA_TOKEN' not provided(s)"
 	);
 
-console.log("TCL: config", config);
-
 export { config };
