@@ -35,7 +35,7 @@ export type Config = {
 		outputCSSUnit?: Config["outputCSSUnit"];
 		outputNameFormat?: Config["outputNameFormat"];
 		prefix?: string;
-		processValue?: "color" | "grid" | "radius" | "shadow";
+		processValue?: "color" | "font" | "grid" | "radius" | "shadow";
 		suffix?: string;
 		style?: boolean; // use style id to generate the token
 		styleKey?: "fill" | "text" | "effect" | "grid"; // select the key from style object to find the style id,

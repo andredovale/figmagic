@@ -10,7 +10,7 @@
 		"salesforce theo"
 	],
 	"homepage": "https://www.figmagic.com",
-	"version": "1.0.24",
+	"version": "1.0.25",
 	"author": "Mikael Vesavuori",
 	"main": "dist/index.js",
 	"license": "MIT",

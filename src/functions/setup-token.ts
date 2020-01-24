@@ -1,25 +1,9 @@
 import _get from "lodash/get";
-import _camelCase from "lodash/camelCase";
-import _kebabCase from "lodash/kebabCase";
-import _lowerCase from "lodash/lowerCase";
-import _snakeCase from "lodash/snakeCase";
-import _startCase from "lodash/startCase";
-import _upperCase from "lodash/upperCase";
 import { Frame } from "../types/frame";
 import { Config } from "../types/config";
 import { Page } from "../types/page";
-import { config } from "../config";
 import { processToken } from "./process-token";
-
-const { outputNameFormat } = config;
-const parseStringFormat = {
-	camel: _camelCase,
-	kebab: _kebabCase,
-	lower: _lowerCase,
-	snake: _snakeCase,
-	start: _startCase,
-	upper: _upperCase
-};
+import { stringParser } from "./parse-string";
 
 export const setupToken = (
 	token: Config["tokens"][0],
@@ -29,7 +13,8 @@ export const setupToken = (
 	const tokens: { [key: string]: string | {} } = {};
 
 	const buildToken = (currentFrame: Frame, name?: string) => {
-		if (token.type && _kebabCase(currentFrame.type) !== token.type) return;
+		if (token.type && stringParser(currentFrame.type) !== token.type)
+			return;
 
 		if (token.style && !token.styleKey)
 			throw new Error("styleKey don't founded");
@@ -41,12 +26,10 @@ export const setupToken = (
 		}
 
 		if (typeof key !== "string") {
-			key = currentFrame.name;
+			key = currentFrame.characters || currentFrame.name;
 		}
 
-		const parsedKey = parseStringFormat[
-			token.outputNameFormat || outputNameFormat
-		](key);
+		const parsedKey = stringParser(key, token.outputNameFormat);
 
 		if (token.processValue) {
 			tokens[parsedKey] = processToken(
@@ -76,7 +59,8 @@ export const setupToken = (
 				if (currentFrame.children && token.path !== "children") {
 					for (const currentGroupFrame of (currentFrame as Page)
 						.children) {
-						buildToken(currentGroupFrame, currentFrame.name);
+						recursive(currentGroupFrame);
+						// buildToken(currentGroupFrame, currentFrame.name);
 					}
 					return;
 				}
@@ -99,7 +83,8 @@ export const setupToken = (
 		for (const frameName of token.frameName) {
 			frames.push(
 				page.children.filter(
-					frame => _kebabCase(frame.name) === _kebabCase(frameName)
+					frame =>
+						stringParser(frame.name) === stringParser(frameName)
 				)[0]
 			);
 		}
@@ -112,7 +97,8 @@ export const setupToken = (
 	} else {
 		const frame = page.children.filter(
 			frame =>
-				_kebabCase(frame.name) === _kebabCase(token.frameName as string)
+				stringParser(frame.name) ===
+				stringParser(token.frameName as string)
 		)[0];
 
 		if (!frame) throw new Error("No frame for setupToken()!");

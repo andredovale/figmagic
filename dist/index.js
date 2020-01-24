@@ -197,6 +197,24 @@ var tokens = [
 		processValue: "color"
 	},
 	{
+		frameName: "fonts",
+		name: "font",
+		path: "style",
+		processValue: "font",
+		type: "text"
+	},
+	{
+		frameName: [
+			"grid-desktop",
+			"grid-notebook-small",
+			"grid-tablet",
+			"grid-smartphone"
+		],
+		name: "grid",
+		path: "children",
+		processValue: "grid"
+	},
+	{
 		frameName: "mixins",
 		group: true,
 		name: "mixin",
@@ -225,17 +243,6 @@ var tokens = [
 		name: "spacing",
 		path: "absoluteBoundingBox.width",
 		suffix: "px"
-	},
-	{
-		frameName: [
-			"grid-desktop",
-			"grid-notebook-small",
-			"grid-tablet",
-			"grid-smartphone"
-		],
-		name: "grid",
-		path: "children",
-		processValue: "grid"
 	}
 ];
 var defaultConfig = {
@@ -322,6 +329,12 @@ if (
 	throw new Error(
 		"The environment variables 'FIGMA_URL' or 'FIGMA_TOKEN' not provided(s)"
 	);
+
+var createFolder = function(directory) {
+	if (!directory)
+		throw new Error("No directory specified for createFolder()!");
+	if (!fs.existsSync(directory)) fs.mkdirSync(directory);
+};
 
 var commonjsGlobal =
 	typeof globalThis !== "undefined"
@@ -1402,10 +1415,125 @@ var kebabCase = _createCompounder(function(result, word, index) {
 
 var kebabCase_1 = kebabCase;
 
-var createFolder = function(directory) {
-	if (!directory)
-		throw new Error("No directory specified for createFolder()!");
-	if (!fs.existsSync(directory)) fs.mkdirSync(directory);
+/**
+ * Converts `string`, as space separated words, to lower case.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category String
+ * @param {string} [string=''] The string to convert.
+ * @returns {string} Returns the lower cased string.
+ * @example
+ *
+ * _.lowerCase('--Foo-Bar--');
+ * // => 'foo bar'
+ *
+ * _.lowerCase('fooBar');
+ * // => 'foo bar'
+ *
+ * _.lowerCase('__FOO_BAR__');
+ * // => 'foo bar'
+ */
+var lowerCase = _createCompounder(function(result, word, index) {
+	return result + (index ? " " : "") + word.toLowerCase();
+});
+
+var lowerCase_1 = lowerCase;
+
+/**
+ * Converts `string` to
+ * [snake case](https://en.wikipedia.org/wiki/Snake_case).
+ *
+ * @static
+ * @memberOf _
+ * @since 3.0.0
+ * @category String
+ * @param {string} [string=''] The string to convert.
+ * @returns {string} Returns the snake cased string.
+ * @example
+ *
+ * _.snakeCase('Foo Bar');
+ * // => 'foo_bar'
+ *
+ * _.snakeCase('fooBar');
+ * // => 'foo_bar'
+ *
+ * _.snakeCase('--FOO-BAR--');
+ * // => 'foo_bar'
+ */
+var snakeCase = _createCompounder(function(result, word, index) {
+	return result + (index ? "_" : "") + word.toLowerCase();
+});
+
+var snakeCase_1 = snakeCase;
+
+/**
+ * Converts `string` to
+ * [start case](https://en.wikipedia.org/wiki/Letter_case#Stylistic_or_specialised_usage).
+ *
+ * @static
+ * @memberOf _
+ * @since 3.1.0
+ * @category String
+ * @param {string} [string=''] The string to convert.
+ * @returns {string} Returns the start cased string.
+ * @example
+ *
+ * _.startCase('--foo-bar--');
+ * // => 'Foo Bar'
+ *
+ * _.startCase('fooBar');
+ * // => 'Foo Bar'
+ *
+ * _.startCase('__FOO_BAR__');
+ * // => 'FOO BAR'
+ */
+var startCase = _createCompounder(function(result, word, index) {
+	return result + (index ? " " : "") + upperFirst_1(word);
+});
+
+var startCase_1 = startCase;
+
+/**
+ * Converts `string`, as space separated words, to upper case.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category String
+ * @param {string} [string=''] The string to convert.
+ * @returns {string} Returns the upper cased string.
+ * @example
+ *
+ * _.upperCase('--foo-bar');
+ * // => 'FOO BAR'
+ *
+ * _.upperCase('fooBar');
+ * // => 'FOO BAR'
+ *
+ * _.upperCase('__foo_bar__');
+ * // => 'FOO BAR'
+ */
+var upperCase = _createCompounder(function(result, word, index) {
+	return result + (index ? " " : "") + word.toUpperCase();
+});
+
+var upperCase_1 = upperCase;
+
+var outputNameFormat$1 = config.outputNameFormat;
+var parseStringFormat = {
+	camel: camelCase_1,
+	kebab: kebabCase_1,
+	lower: lowerCase_1,
+	snake: snakeCase_1,
+	start: startCase_1,
+	upper: upperCase_1
+};
+var stringParser = function(string, tokenOutputNameFormat) {
+	return parseStringFormat[tokenOutputNameFormat || outputNameFormat$1](
+		string
+	);
 };
 
 var format$1 = config.format;
@@ -1424,9 +1552,9 @@ var writeDeclarations = function(file, name, filePath) {
 	fs.writeFile(
 		filePath.replace("." + format$1, ".d.ts"),
 		"export default " +
-			camelCase_1(name) +
+			stringParser(name, "camel") +
 			";\n\ndeclare const " +
-			camelCase_1(name) +
+			stringParser(name, "camel") +
 			': {\n\t"' +
 			Object.keys(file).join('": string;\n	"') +
 			'": string;\n};\n',
@@ -1441,16 +1569,16 @@ var writeDeclarations = function(file, name, filePath) {
 };
 var write = function(file, path, name, isToken) {
 	var fileContent = file;
-	var filePath = path + "/" + kebabCase_1(name);
+	var filePath = path + "/" + stringParser(name);
 	if (isToken) {
-		var _camelCaseName = camelCase_1(name);
+		var camelCaseName = stringParser(name, "camel");
 		fileContent =
 			"const " +
-			_camelCaseName +
+			camelCaseName +
 			" = " +
 			JSON.stringify(file, null, "	") +
 			"\n\nexport default " +
-			_camelCaseName +
+			camelCaseName +
 			";";
 	}
 	filePath += "." + format$1;
@@ -2455,112 +2583,6 @@ function get(object, path, defaultValue) {
 
 var get_1 = get;
 
-/**
- * Converts `string`, as space separated words, to lower case.
- *
- * @static
- * @memberOf _
- * @since 4.0.0
- * @category String
- * @param {string} [string=''] The string to convert.
- * @returns {string} Returns the lower cased string.
- * @example
- *
- * _.lowerCase('--Foo-Bar--');
- * // => 'foo bar'
- *
- * _.lowerCase('fooBar');
- * // => 'foo bar'
- *
- * _.lowerCase('__FOO_BAR__');
- * // => 'foo bar'
- */
-var lowerCase = _createCompounder(function(result, word, index) {
-	return result + (index ? " " : "") + word.toLowerCase();
-});
-
-var lowerCase_1 = lowerCase;
-
-/**
- * Converts `string` to
- * [snake case](https://en.wikipedia.org/wiki/Snake_case).
- *
- * @static
- * @memberOf _
- * @since 3.0.0
- * @category String
- * @param {string} [string=''] The string to convert.
- * @returns {string} Returns the snake cased string.
- * @example
- *
- * _.snakeCase('Foo Bar');
- * // => 'foo_bar'
- *
- * _.snakeCase('fooBar');
- * // => 'foo_bar'
- *
- * _.snakeCase('--FOO-BAR--');
- * // => 'foo_bar'
- */
-var snakeCase = _createCompounder(function(result, word, index) {
-	return result + (index ? "_" : "") + word.toLowerCase();
-});
-
-var snakeCase_1 = snakeCase;
-
-/**
- * Converts `string` to
- * [start case](https://en.wikipedia.org/wiki/Letter_case#Stylistic_or_specialised_usage).
- *
- * @static
- * @memberOf _
- * @since 3.1.0
- * @category String
- * @param {string} [string=''] The string to convert.
- * @returns {string} Returns the start cased string.
- * @example
- *
- * _.startCase('--foo-bar--');
- * // => 'Foo Bar'
- *
- * _.startCase('fooBar');
- * // => 'Foo Bar'
- *
- * _.startCase('__FOO_BAR__');
- * // => 'FOO BAR'
- */
-var startCase = _createCompounder(function(result, word, index) {
-	return result + (index ? " " : "") + upperFirst_1(word);
-});
-
-var startCase_1 = startCase;
-
-/**
- * Converts `string`, as space separated words, to upper case.
- *
- * @static
- * @memberOf _
- * @since 4.0.0
- * @category String
- * @param {string} [string=''] The string to convert.
- * @returns {string} Returns the upper cased string.
- * @example
- *
- * _.upperCase('--foo-bar');
- * // => 'FOO BAR'
- *
- * _.upperCase('fooBar');
- * // => 'FOO BAR'
- *
- * _.upperCase('__foo_bar__');
- * // => 'FOO BAR'
- */
-var upperCase = _createCompounder(function(result, word, index) {
-	return result + (index ? " " : "") + word.toUpperCase();
-});
-
-var upperCase_1 = upperCase;
-
 var roundToDecimal = function(value, decimals) {
 	if (!value) throw new Error("No number value provided to roundNumber()!");
 	if (!decimals) decimals = 0;
@@ -2592,6 +2614,16 @@ var processToken = function(value, token, frame) {
 				", " +
 				colorA +
 				")";
+			break;
+		case "font":
+			var font = {};
+			for (var key in value) {
+				if (value.hasOwnProperty(key)) {
+					var element = value[key];
+					font[stringParser(key, token.outputNameFormat)] = element;
+				}
+			}
+			processedToken = font;
 			break;
 		case "grid":
 			var grid = {
@@ -2653,19 +2685,11 @@ var processToken = function(value, token, frame) {
 	return processedToken;
 };
 
-var outputNameFormat$1 = config.outputNameFormat;
-var parseStringFormat = {
-	camel: camelCase_1,
-	kebab: kebabCase_1,
-	lower: lowerCase_1,
-	snake: snakeCase_1,
-	start: startCase_1,
-	upper: upperCase_1
-};
 var setupToken = function(token, page, styles) {
 	var tokens = {};
 	var buildToken = function(currentFrame, name) {
-		if (token.type && kebabCase_1(currentFrame.type) !== token.type) return;
+		if (token.type && stringParser(currentFrame.type) !== token.type)
+			return;
 		if (token.style && !token.styleKey)
 			throw new Error("styleKey don't founded");
 		var key = name || get_1(currentFrame, token.path);
@@ -2673,11 +2697,9 @@ var setupToken = function(token, page, styles) {
 			key = styles[get_1(currentFrame, "styles." + token.styleKey)].name;
 		}
 		if (typeof key !== "string") {
-			key = currentFrame.name;
+			key = currentFrame.characters || currentFrame.name;
 		}
-		var parsedKey = parseStringFormat[
-			token.outputNameFormat || outputNameFormat$1
-		](key);
+		var parsedKey = stringParser(key, token.outputNameFormat);
 		if (token.processValue) {
 			tokens[parsedKey] = processToken(
 				get_1(currentFrame, token.path),
@@ -2715,7 +2737,8 @@ var setupToken = function(token, page, styles) {
 						_b++
 					) {
 						var currentGroupFrame = _c[_b];
-						buildToken(currentGroupFrame, currentFrame.name);
+						recursive(currentGroupFrame);
+						// buildToken(currentGroupFrame, currentFrame.name);
 					}
 					return;
 				}
@@ -2736,7 +2759,7 @@ var setupToken = function(token, page, styles) {
 		var _loop_1 = function(frameName) {
 			frames_2.push(
 				page.children.filter(function(frame) {
-					return kebabCase_1(frame.name) === kebabCase_1(frameName);
+					return stringParser(frame.name) === stringParser(frameName);
 				})[0]
 			);
 		};
@@ -2751,7 +2774,7 @@ var setupToken = function(token, page, styles) {
 		}
 	} else {
 		var frame = page.children.filter(function(frame) {
-			return kebabCase_1(frame.name) === kebabCase_1(token.frameName);
+			return stringParser(frame.name) === stringParser(token.frameName);
 		})[0];
 		if (!frame) throw new Error("No frame for setupToken()!");
 		processFrame(frame);
@@ -2763,7 +2786,7 @@ var figmaPage$1 = config.figmaPage;
 var tokensPage = function(figmaPages) {
 	if (!figmaPages || !figmaPages.length)
 		throw new Error("No pages provided to tokensPage()!");
-	var targetPage = kebabCase_1(figmaPage$1);
+	var targetPage = stringParser(figmaPage$1);
 	var correctPage;
 	for (
 		var _i = 0, figmaPages_1 = figmaPages;
@@ -2771,7 +2794,7 @@ var tokensPage = function(figmaPages) {
 		_i++
 	) {
 		var page = figmaPages_1[_i];
-		if (kebabCase_1(page.name) === targetPage) {
+		if (stringParser(page.name) === targetPage) {
 			correctPage = page;
 			break;
 		}

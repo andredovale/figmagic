@@ -1,6 +1,7 @@
 import { Config } from "../types/config";
 import { roundToDecimal } from "./round-to-decimal";
 import { Frame } from "../types/frame";
+import { stringParser } from "./parse-string";
 
 const processToken = (value: any, token: Config["tokens"][0], frame: Frame) => {
 	if (!value && !token.fallback)
@@ -24,6 +25,17 @@ const processToken = (value: any, token: Config["tokens"][0], frame: Frame) => {
 			const colorA = roundToDecimal(value.a * 1, 3);
 
 			processedToken = `rgba(${colorR}, ${colorG}, ${colorB}, ${colorA})`;
+			break;
+
+		case "font":
+			const font: { [key: string]: any } = {};
+			for (const key in value) {
+				if (value.hasOwnProperty(key)) {
+					const element = value[key];
+					font[stringParser(key, token.outputNameFormat)] = element;
+				}
+			}
+			processedToken = font;
 			break;
 
 		case "grid":

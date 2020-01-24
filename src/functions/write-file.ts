@@ -1,7 +1,6 @@
 import fs from "fs";
-import _camelCase from "lodash/camelCase";
-import _kebabCase from "lodash/kebabCase";
 import { createFolder } from "./create-folder";
+import { stringParser } from "./parse-string";
 
 import { config } from "../config";
 
@@ -33,9 +32,12 @@ const writeDeclarations = (
 ) => {
 	fs.writeFile(
 		filePath.replace(`.${format}`, ".d.ts"),
-		`export default ${_camelCase(name)};\n\ndeclare const ${_camelCase(
-			name
-		)}: {\n	"${Object.keys(file).join('": string;\n	"')}": string;\n};\n`,
+		`export default ${stringParser(
+			name,
+			"camel"
+		)};\n\ndeclare const ${stringParser(name, "camel")}: {\n	"${Object.keys(
+			file
+		).join('": string;\n	"')}": string;\n};\n`,
 		"utf-8",
 		error => {
 			if (error)
@@ -53,15 +55,15 @@ const write = (
 	isToken: boolean
 ) => {
 	let fileContent: string | Json = file;
-	let filePath = `${path}/${_kebabCase(name)}`;
+	let filePath = `${path}/${stringParser(name)}`;
 
 	if (isToken) {
-		const _camelCaseName = _camelCase(name);
-		fileContent = `const ${_camelCaseName} = ${JSON.stringify(
+		const camelCaseName = stringParser(name, "camel");
+		fileContent = `const ${camelCaseName} = ${JSON.stringify(
 			file,
 			null,
 			"	"
-		)}\n\nexport default ${_camelCaseName};`;
+		)}\n\nexport default ${camelCaseName};`;
 	}
 	filePath += `.${format}`;
 

@@ -25,6 +25,24 @@
 			"processValue": "color"
 		},
 		{
+			"frameName": "fonts",
+			"name": "font",
+			"path": "style",
+			"processValue": "font",
+			"type": "text"
+		},
+		{
+			"frameName": [
+				"grid-desktop",
+				"grid-notebook-small",
+				"grid-tablet",
+				"grid-smartphone"
+			],
+			"name": "grid",
+			"path": "children",
+			"processValue": "grid"
+		},
+		{
 			"frameName": "mixins",
 			"group": true,
 			"name": "mixin",
@@ -53,17 +71,6 @@
 			"name": "spacing",
 			"path": "absoluteBoundingBox.width",
 			"suffix": "px"
-		},
-		{
-			"frameName": [
-				"grid-desktop",
-				"grid-notebook-small",
-				"grid-tablet",
-				"grid-smartphone"
-			],
-			"name": "grid",
-			"path": "children",
-			"processValue": "grid"
 		}
 	]
 }
