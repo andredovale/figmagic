@@ -34,7 +34,9 @@ argv
 			if (configFile) {
 				config = {
 					...config,
-					...JSON.parse(fs.readFileSync(".figmagic.json", "utf8"))
+					...JSON.parse(
+						fs.readFileSync(".figmagic.json", "utf8") || "{}"
+					)
 				};
 			}
 
@@ -68,10 +70,7 @@ argv
 		string: true
 	}).argv;
 
-if (
-	(!process.env.FIGMA_URL && !config.figmaUrl) ||
-	(!process.env.FIGMA_TOKEN && !config.figmaToken)
-)
+if (!config.figmaUrl || !config.figmaToken)
 	throw new Error(
 		"The environment variables 'FIGMA_URL' or 'FIGMA_TOKEN' not provided(s)"
 	);

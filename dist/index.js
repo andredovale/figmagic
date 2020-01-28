@@ -284,7 +284,9 @@ argv
 			if (configFile) {
 				config = __assign(
 					__assign({}, config),
-					JSON.parse(fs.readFileSync(".figmagic.json", "utf8"))
+					JSON.parse(
+						fs.readFileSync(".figmagic.json", "utf8") || "{}"
+					)
 				);
 			}
 			return configFile;
@@ -322,10 +324,7 @@ argv
 		required: false,
 		string: true
 	}).argv;
-if (
-	(!process.env.FIGMA_URL && !config.figmaUrl) ||
-	(!process.env.FIGMA_TOKEN && !config.figmaToken)
-)
+if (!config.figmaUrl || !config.figmaToken)
 	throw new Error(
 		"The environment variables 'FIGMA_URL' or 'FIGMA_TOKEN' not provided(s)"
 	);
@@ -2829,8 +2828,6 @@ var writeTokens = function(data) {
 					return [4 /*yield*/, getFromApi()];
 				case 1:
 					data = _a.sent();
-					// const tokens = createPage(data.document.children);
-					// const styles = data.styles;
 					writeTokens(data);
 					return [2 /*return*/];
 			}
