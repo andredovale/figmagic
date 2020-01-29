@@ -1600,6 +1600,7 @@ var getFromApi = function() {
 				case 0:
 					data = {};
 					url = apiBaseUrl$1 + figmaUrl$1;
+					console.log("TCL: getFromApi -> url", url);
 					return [
 						4 /*yield*/,
 						fetch(url, {
@@ -1611,28 +1612,49 @@ var getFromApi = function() {
 								throw new Error("Figma Error: " + error);
 							})
 							.then(function(response) {
-								if (response.status !== 200)
-									throw new Error(
-										"Error to get Figma metadata from API"
-									);
-								return response.json();
-							})
-							.then(function(json) {
-								if (json.err)
-									throw new Error(
-										"Figma Error: " +
-											json.status +
-											" - " +
-											json.err
-									);
-								data = json;
-								if (figmaJson$1)
-									writeFile(
-										JSON.stringify(json, undefined, 2),
-										"figma",
-										"figma",
-										false
-									);
+								return __awaiter(
+									void 0,
+									void 0,
+									void 0,
+									function() {
+										var json;
+										return __generator(this, function(_a) {
+											switch (_a.label) {
+												case 0:
+													if (response.status !== 200)
+														throw new Error(
+															"Error to get Figma metadata from API"
+														);
+													return [
+														4 /*yield*/,
+														response.json()
+													];
+												case 1:
+													json = _a.sent();
+													if (json.err)
+														throw new Error(
+															"Figma Error: " +
+																json.status +
+																" - " +
+																json.err
+														);
+													data = json;
+													if (figmaJson$1)
+														writeFile(
+															JSON.stringify(
+																json,
+																undefined,
+																2
+															),
+															"figma",
+															"figma",
+															false
+														);
+													return [2 /*return*/];
+											}
+										});
+									}
+								);
 							})
 					];
 				case 1:

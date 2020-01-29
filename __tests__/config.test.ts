@@ -76,7 +76,7 @@ describe("It should return config without error", () => {
 		process.argv = ARGV;
 		process.env = ENV;
 
-		const config = require("../src/config").config;
+		const { config } = require("../src/config");
 
 		expect(config).toMatchObject(mock);
 	});
@@ -85,7 +85,7 @@ describe("It should return config without error", () => {
 		process.argv = [...ARGV, "-c"];
 		process.env = ENV;
 
-		const config = require("../src/config").config;
+		const { config } = require("../src/config");
 
 		expect(config).toMatchObject(mock);
 	});
@@ -94,7 +94,7 @@ describe("It should return config without error", () => {
 		process.argv = ARGV;
 		process.env = { ...ENV, FIGMA_PAGE: undefined };
 
-		const config = require("../src/config").config;
+		const { config } = require("../src/config");
 
 		jest.mock("../.figmagic.json", () => ({
 			figmaPage: "Design tokens"

@@ -1,70 +1,170 @@
-import { processTokens } from "../../src/functions/process-tokens";
+import { processToken } from "../../src/functions/process-token";
 import { Frame } from "../../src/types/frame";
 
-describe("It should throw an error if no parameter is provided", () => {
-	test("Without first parameter", () => {
+describe("It should throw an error", () => {
+	test("Without 'value' and 'token.fallback' parameter", () => {
 		expect(() => {
-			// @ts-ignore
-			processTokens(undefined, "Lorem Ipsum");
+			processToken(
+				null,
+				{
+					frameName: "lorem",
+					name: "ipsum",
+					path: "dolor"
+				},
+				{} as Frame
+			);
 		}).toThrow();
 	});
 
-	test("Without second parameter", () => {
+	test("With 'token.processValue' has 'color', but 'value' isn't a object", () => {
 		expect(() => {
-			// @ts-ignore
-			processTokens({});
+			processToken(
+				true,
+				{
+					frameName: "lorem",
+					name: "ipsum",
+					path: "dolor",
+					processValue: "color"
+				},
+				{} as Frame
+			);
+		}).toThrow();
+	});
+
+	test("With 'token.processValue' has 'color', but 'value' don't have the required keys", () => {
+		expect(() => {
+			processToken(
+				{ r: 255, g: 0, b: 0 },
+				{
+					frameName: "lorem",
+					name: "ipsum",
+					path: "dolor",
+					processValue: "color"
+				},
+				{} as Frame
+			);
+		}).toThrow();
+	});
+
+	test("With 'token.processValue' has 'color', but 'value' isn't a object", () => {
+		expect(() => {
+			processToken(
+				true,
+				{
+					frameName: "lorem",
+					name: "ipsum",
+					path: "dolor",
+					processValue: "font"
+				},
+				{} as Frame
+			);
+		}).toThrow();
+	});
+
+	test("With 'token.processValue' has 'grid', but 'value' isn't a array", () => {
+		expect(() => {
+			processToken(
+				true,
+				{
+					frameName: "lorem",
+					name: "ipsum",
+					path: "dolor",
+					processValue: "grid"
+				},
+				{} as Frame
+			);
+		}).toThrow();
+	});
+
+	test("With 'token.processValue' has 'grid', but 'value' don't have two minimum items", () => {
+		expect(() => {
+			processToken(
+				[""],
+				{
+					frameName: "lorem",
+					name: "ipsum",
+					path: "dolor",
+					processValue: "grid"
+				},
+				{} as Frame
+			);
 		}).toThrow();
 	});
 });
 
-describe("It should enter in all cases of switch", () => {
-	const frame: Frame = {
-		name: "lorem",
-		children: [
-			{
-				absoluteBoundingBox: {
-					width: 2
+describe("It should return the processed token", () => {
+	test("With fallback", () => {
+		expect(
+			processToken(
+				null,
+				{
+					frameName: "lorem",
+					name: "ipsum",
+					path: "dolor",
+					fallback: "sit"
 				},
-				cornerRadius: 4,
-				effects: [
-					{
-						offset: { x: 100, y: 100 },
-						radius: 4,
-						color: { r: 0.2, g: 0.3, b: 0.4, a: 1 }
-					}
-				],
-				fills: [{ color: { r: 0.2, g: 0.3, b: 0.4, a: 1 } }],
-				name: "Lorem Ipsum",
-				strokeWeight: 2,
-				strokes: [{ type: "solid" }],
-				style: {
-					...({} as Frame["children"][0]["style"]),
-					fontFamily: "Arial Narrow",
-					fontPostScriptName: "ArialNarrow",
-					fontSize: 16,
-					fontWeight: 900,
-					lineHeightPx: 24
-				}
-			}
-		]
-	};
+				{} as Frame
+			)
+		).toBe("sit");
+	});
 
-	const mock = [
-		{ sheet: frame, name: "animation" },
-		{ sheet: frame, name: "border" },
-		{ sheet: frame, name: "color" },
-		{ sheet: frame, name: "fontSize" },
-		{ sheet: frame, name: "fontFamily" },
-		{ sheet: frame, name: "fontWeight" },
-		{ sheet: frame, name: "lineHeight" },
-		{ sheet: frame, name: "radius" },
-		{ sheet: frame, name: "shadow" },
-		{ sheet: frame, name: "spacing" }
-	];
+	test("Without 'token.processValue'", () => {
+		expect(
+			processToken(
+				{},
+				{
+					frameName: "lorem",
+					name: "ipsum",
+					path: "dolor"
+				},
+				{} as Frame
+			)
+		).toBe("");
+	});
 
-	for (const item of mock) {
-		test(`Case: ${item.name}`, () => {
-			expect(processTokens(item.sheet, item.name)).toBeInstanceOf(Object);
-		});
-	}
+	test("With 'token.processValue' has color", () => {
+		expect(
+			processToken(
+				{ r: 1, g: 0, b: 0, a: 0 },
+				{
+					frameName: "lorem",
+					name: "ipsum",
+					path: "dolor",
+					processValue: "color"
+				},
+				{} as Frame
+			)
+		).toBe("rgba(255, 0, 0, 0)");
+	});
+
+	test("With 'token.processValue' has font", () => {
+		const expected = { "lorem-ipsum": "dolor", "sit-amet": "et" };
+		expect(
+			processToken(
+				{ loremIpsum: "dolor", sitAmet: "et" },
+				{
+					frameName: "lorem",
+					name: "ipsum",
+					path: "dolor",
+					processValue: "font"
+				},
+				{} as Frame
+			)
+		).toMatchObject(expected);
+	});
+
+	test("With 'token.processValue' has font and 'value' as an falsy key", () => {
+		expect(
+			processToken(
+				Object.create({ "": "" }),
+				{
+					frameName: "lorem",
+					name: "ipsum",
+					path: "dolor",
+					processValue: "font"
+				},
+				{} as Frame
+			)
+		).toEqual({});
+	});
 });

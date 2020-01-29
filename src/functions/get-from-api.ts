@@ -14,19 +14,18 @@ export const getFromApi = async () => {
 
 	await fetch(url, {
 		headers: {
-			"X-Figma-Token": figmaToken as string
+			"X-Figma-Token": figmaToken
 		}
 	})
 		.catch(error => {
 			throw new Error("Figma Error: " + error);
 		})
-		.then(response => {
+		.then(async response => {
 			if (response.status !== 200)
 				throw new Error("Error to get Figma metadata from API");
 
-			return response.json();
-		})
-		.then((json: Json) => {
+			const json: Json = await response.json();
+
 			if (json.err)
 				throw new Error(
 					"Figma Error: " + json.status + " - " + json.err

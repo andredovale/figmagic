@@ -19,6 +19,20 @@ const processToken = (value: any, token: Config["tokens"][0], frame: Frame) => {
 
 	switch (token.processValue) {
 		case "color":
+			if (typeof value !== "object")
+				throw new Error(
+					`The processValue ${token.processValue} need an object has value`
+				);
+
+			const expectedKeys = ["r", "g", "b", "a"];
+
+			for (const expectedKey of expectedKeys) {
+				if (!Object.keys(value).includes(expectedKey))
+					throw new Error(
+						`The value for 'color' don't have the '${expectedKey}' key`
+					);
+			}
+
 			const colorR = Math.round(value.r * 255);
 			const colorG = Math.round(value.g * 255);
 			const colorB = Math.round(value.b * 255);
@@ -28,6 +42,11 @@ const processToken = (value: any, token: Config["tokens"][0], frame: Frame) => {
 			break;
 
 		case "font":
+			if (typeof value !== "object")
+				throw new Error(
+					`The processValue ${token.processValue} need an object has value`
+				);
+
 			const font: { [key: string]: any } = {};
 			for (const key in value) {
 				if (value.hasOwnProperty(key)) {
@@ -39,6 +58,16 @@ const processToken = (value: any, token: Config["tokens"][0], frame: Frame) => {
 			break;
 
 		case "grid":
+			if (!Array.isArray(value))
+				throw new Error(
+					`The processValue ${token.processValue} need an array has value`
+				);
+
+			if (value.length < 2)
+				throw new Error(
+					`The processValue ${token.processValue} need the minimum two items`
+				);
+
 			const grid: {
 				"column-count": number;
 				"column-width": string;
