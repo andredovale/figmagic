@@ -1,12 +1,12 @@
-import { writeFile } from "../../src/functions/write-file";
 import fs from "fs";
-import yaml from "js-yaml";
-import { createFolder } from "../../src/functions/create-folder";
+import { writeFile } from "../../src/functions/write-file";
 
 jest.mock("fs");
-jest.mock("js-yaml");
+jest.mock("../../src/config", () => ({
+	config: { format: "js", outputNameFormat: "kebab" }
+}));
 
-describe("It should throw an error if no parameter is provided", () => {
+describe("It should throw an error", () => {
 	test("Without first parameter", () => {
 		expect(() => {
 			// @ts-ignore
@@ -27,6 +27,30 @@ describe("It should throw an error if no parameter is provided", () => {
 			writeFile("lorem", "ipsum", undefined);
 		}).toThrow();
 	});
+
+	test("Writing the token file", () => {
+		(<jest.Mock>(
+			(<unknown>fs.writeFile)
+		)).mockImplementationOnce(
+			(_, __, ___, callback: Function = jest.fn()) => callback(true)
+		);
+
+		expect(() => {
+			writeFile({}, "lorem", "ipsum");
+		}).toThrow();
+	});
+
+	test("Writing .d.ts file", () => {
+		(<jest.Mock>(<unknown>fs.writeFile))
+			.mockImplementationOnce(() => {})
+			.mockImplementationOnce(
+				(_, __, ___, callback: Function = jest.fn()) => callback(true)
+			);
+
+		expect(() => {
+			writeFile({}, "lorem", "ipsum");
+		}).toThrow();
+	});
 });
 
 describe("It should change the default parameters", () => {
@@ -35,16 +59,30 @@ describe("It should change the default parameters", () => {
 
 		expect(fs.writeFile).toBeCalled();
 	});
-
-	test("Changing 'format' parameter", () => {
-		writeFile("lorem", "ipsum", "dolor", false, "ts");
-
-		expect(fs.writeFile).toBeCalled();
-	});
 });
 
-test("It should pass yaml as format and invoke yaml dump fn", () => {
-	writeFile("lorem", "ipsum", "dolor", true, "yaml");
+describe("It should succeed to write files", () => {
+	test("Writing the token file", () => {
+		(<jest.Mock>(
+			(<unknown>fs.writeFile)
+		)).mockImplementationOnce(
+			(_, __, ___, callback: Function = jest.fn()) => callback(false)
+		);
 
-	expect(yaml.dump).toBeCalled();
+		expect(() => {
+			writeFile({}, "lorem", "ipsum");
+		}).not.toThrow();
+	});
+
+	test("Writing .d.ts file", () => {
+		(<jest.Mock>(<unknown>fs.writeFile))
+			.mockImplementationOnce(() => {})
+			.mockImplementationOnce(
+				(_, __, ___, callback: Function = jest.fn()) => callback(false)
+			);
+
+		expect(() => {
+			writeFile({}, "lorem", "ipsum");
+		}).not.toThrow();
+	});
 });

@@ -90,6 +90,36 @@ describe("It should throw an error", () => {
 			);
 		}).toThrow();
 	});
+
+	test("With 'token.processValue' has 'radius', but 'value' isn't a array", () => {
+		expect(() => {
+			processToken(
+				true,
+				{
+					frameName: "lorem",
+					name: "ipsum",
+					path: "dolor",
+					processValue: "radius"
+				},
+				{} as Frame
+			);
+		}).toThrow();
+	});
+
+	test("With 'token.processValue' has 'shadow', but 'value' isn't a object", () => {
+		expect(() => {
+			processToken(
+				true,
+				{
+					frameName: "lorem",
+					name: "ipsum",
+					path: "dolor",
+					processValue: "shadow"
+				},
+				{} as Frame
+			);
+		}).toThrow();
+	});
 });
 
 describe("It should return the processed token", () => {
@@ -122,7 +152,7 @@ describe("It should return the processed token", () => {
 		).toBe("");
 	});
 
-	test("With 'token.processValue' has color", () => {
+	test("With 'token.processValue' has 'color'", () => {
 		expect(
 			processToken(
 				{ r: 1, g: 0, b: 0, a: 0 },
@@ -166,5 +196,82 @@ describe("It should return the processed token", () => {
 				{} as Frame
 			)
 		).toEqual({});
+	});
+
+	test("With 'token.processValue' has 'grid'", () => {
+		const expected = {
+			"column-count": 2,
+			"column-width": "41.66666666666667%",
+			gutter: "8.333333333333332%",
+			"min-width": "240px"
+		};
+		expect(
+			processToken(
+				[
+					{
+						absoluteBoundingBox: {
+							width: 100,
+							x: 0
+						}
+					},
+					{
+						absoluteBoundingBox: {
+							width: 100,
+							x: 120
+						}
+					}
+				],
+				{
+					frameName: "lorem",
+					name: "ipsum",
+					path: "dolor",
+					processValue: "grid"
+				},
+				{
+					absoluteBoundingBox: {
+						width: 240
+					}
+				} as Frame
+			)
+		).toMatchObject(expected);
+	});
+
+	test("With 'token.processValue' has 'radius'", () => {
+		const expected = "lorem ipsum dolor";
+		expect(
+			processToken(
+				["lorem", "ipsum", "dolor"],
+				{
+					frameName: "lorem",
+					name: "ipsum",
+					path: "dolor",
+					processValue: "radius"
+				},
+				{} as Frame
+			)
+		).toBe(expected);
+	});
+
+	test("With 'token.processValue' has 'shadow'", () => {
+		const expected = "1px 2px 3px rgba(255, 0, 0, 0)";
+		expect(
+			processToken(
+				{
+					offset: {
+						x: 1,
+						y: 2
+					},
+					radius: 3,
+					color: { r: 1, g: 0, b: 0, a: 0 }
+				},
+				{
+					frameName: "lorem",
+					name: "ipsum",
+					path: "dolor",
+					processValue: "shadow"
+				},
+				{} as Frame
+			)
+		).toBe(expected);
 	});
 });

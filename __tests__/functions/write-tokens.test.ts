@@ -1,53 +1,78 @@
+import { setupToken } from "../../src/functions/setup-token";
 import { writeFile } from "../../src/functions/write-file";
-import { writeTokens } from "../../src/functions/write-tokens";
-import { Frame } from "../../src/types/frame";
 
-jest.mock("fs");
+jest.mock("../../src/functions/setup-token", () => ({
+	setupToken: jest.fn()
+}));
+jest.mock("../../src/functions/tokens-page", () => ({
+	tokensPage: jest.fn()
+}));
+jest.mock("../../src/functions/write-file", () => ({
+	writeFile: jest.fn()
+}));
 
-describe("It should throw an error if no parameter is provided", () => {
-	test("Without first parameter", () => {
-		expect(() => {
-			// @ts-ignore
-			writeTokens(undefined, "js");
-		}).toThrow();
+let writeTokens: Function;
+
+describe("It should throw an error", () => {
+	test("Without tokens on 'config'", () => {
+		jest.mock("../../src/config", () => ({
+			config: {}
+		}));
+
+		jest.isolateModules(() => {
+			({ writeTokens } = require("../../src/functions/write-tokens"));
+		});
+
+		expect(() => writeTokens({})).toThrow();
 	});
 
-	test("Without second parameter", () => {
+	test("Without length in tokens on 'config'", () => {
+		jest.mock("../../src/config", () => ({
+			config: { tokens: [] }
+		}));
+
+		jest.isolateModules(() => {
+			({ writeTokens } = require("../../src/functions/write-tokens"));
+		});
+
 		expect(() => {
-			// @ts-ignore
 			writeTokens({});
 		}).toThrow();
 	});
 });
 
-jest.mock("../../src/functions/write-file", () => ({ writeFile: jest.fn() }));
-
-test("It shouldn't call writeFile", () => {
-	// @ts-ignore
-	const tokens: Frame[] = [{ name: "Lorem Ipsum", children: [{}] }];
-
-	writeTokens(tokens, "js");
-
-	expect((writeFile as jest.Mock).mock.calls.length).toBe(0);
+afterEach(() => {
+	jest.clearAllMocks();
 });
 
-test("It should call writeFile", () => {
-	const tokens: Frame[] = [
-		{
-			name: "animation",
-			children: [
-				{
-					...({} as Frame["children"][0]),
-					absoluteBoundingBox: {
-						width: 2
-					},
-					name: "Lorem Ipsum"
-				}
-			]
-		}
-	];
+test("It should succeed to write files", () => {
+	jest.mock("../../src/config", () => ({
+		config: { tokens: [{}] }
+	}));
 
-	writeTokens(tokens, "js");
+	(<jest.Mock>setupToken).mockReturnValueOnce("Lorem Ipsum");
+	jest.isolateModules(() => {
+		({ writeTokens } = require("../../src/functions/write-tokens"));
+	});
 
-	expect((writeFile as jest.Mock).mock.calls.length).toBe(1);
+	writeTokens({ document: { children: [] } });
+
+	expect(setupToken).toBeCalled();
+	expect(writeFile).toBeCalled();
+});
+
+test("It shouldn't succeed to write files", () => {
+	jest.mock("../../src/config", () => ({
+		config: { tokens: [{}] }
+	}));
+
+	(<jest.Mock>setupToken).mockReturnValueOnce("");
+	jest.isolateModules(() => {
+		({ writeTokens } = require("../../src/functions/write-tokens"));
+	});
+
+	writeTokens({ document: { children: [] } });
+
+	expect(setupToken).toBeCalled();
+	expect(writeFile).not.toBeCalled();
 });

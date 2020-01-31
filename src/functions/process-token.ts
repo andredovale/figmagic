@@ -19,7 +19,9 @@ const processToken = (value: any, token: Config["tokens"][0], frame: Frame) => {
 
 	switch (token.processValue) {
 		case "color":
-			if (typeof value !== "object")
+			const colorValue: Frame["effects"][0]["color"] = value;
+
+			if (typeof colorValue !== "object")
 				throw new Error(
 					`The processValue ${token.processValue} need an object has value`
 				);
@@ -27,30 +29,32 @@ const processToken = (value: any, token: Config["tokens"][0], frame: Frame) => {
 			const expectedKeys = ["r", "g", "b", "a"];
 
 			for (const expectedKey of expectedKeys) {
-				if (!Object.keys(value).includes(expectedKey))
+				if (!Object.keys(colorValue).includes(expectedKey))
 					throw new Error(
 						`The value for 'color' don't have the '${expectedKey}' key`
 					);
 			}
 
-			const colorR = Math.round(value.r * 255);
-			const colorG = Math.round(value.g * 255);
-			const colorB = Math.round(value.b * 255);
-			const colorA = roundToDecimal(value.a * 1, 3);
+			const colorR = Math.round(colorValue.r * 255);
+			const colorG = Math.round(colorValue.g * 255);
+			const colorB = Math.round(colorValue.b * 255);
+			const colorA = roundToDecimal(colorValue.a * 1, 3);
 
 			processedToken = `rgba(${colorR}, ${colorG}, ${colorB}, ${colorA})`;
 			break;
 
 		case "font":
-			if (typeof value !== "object")
+			const fontValue: Frame["style"] = value;
+
+			if (typeof fontValue !== "object")
 				throw new Error(
 					`The processValue ${token.processValue} need an object has value`
 				);
 
 			const font: { [key: string]: any } = {};
-			for (const key in value) {
-				if (value.hasOwnProperty(key)) {
-					const element = value[key];
+			for (const key in fontValue) {
+				if (fontValue.hasOwnProperty(key)) {
+					const element = fontValue[key];
 					font[stringParser(key, token.outputNameFormat)] = element;
 				}
 			}
@@ -58,14 +62,16 @@ const processToken = (value: any, token: Config["tokens"][0], frame: Frame) => {
 			break;
 
 		case "grid":
-			if (!Array.isArray(value))
+			const gridValue: Frame[] = value;
+
+			if (!Array.isArray(gridValue))
 				throw new Error(
 					`The processValue ${token.processValue} need an array has value`
 				);
 
-			if (value.length < 2)
+			if (gridValue.length < 2)
 				throw new Error(
-					`The processValue ${token.processValue} need the minimum two items`
+					`The processValue ${token.processValue} need the minimum of two items`
 				);
 
 			const grid: {
@@ -80,15 +86,15 @@ const processToken = (value: any, token: Config["tokens"][0], frame: Frame) => {
 				"min-width": "0px"
 			};
 
-			grid["column-count"] = value.length;
+			grid["column-count"] = gridValue.length;
 
-			const columnWidth = value[0].absoluteBoundingBox.width;
+			const columnWidth = gridValue[0].absoluteBoundingBox.width;
 			const canvasWidth = frame.absoluteBoundingBox.width;
 
 			grid["column-width"] = `${(columnWidth / canvasWidth) * 100}%`;
 
-			grid.gutter = `${((value[1].absoluteBoundingBox.x -
-				(value[0].absoluteBoundingBox.x + columnWidth)) /
+			grid.gutter = `${((gridValue[1].absoluteBoundingBox.x -
+				(gridValue[0].absoluteBoundingBox.x + columnWidth)) /
 				canvasWidth) *
 				100}%`;
 
@@ -99,22 +105,37 @@ const processToken = (value: any, token: Config["tokens"][0], frame: Frame) => {
 			break;
 
 		case "radius":
-			processedToken = (value as string[])
+			const radiusValue: Frame["rectangleCornerRadii"] = value;
+
+			if (!Array.isArray(radiusValue))
+				throw new Error(
+					`The processValue ${token.processValue} need an array has value`
+				);
+
+			processedToken = radiusValue
 				.map(
 					radius =>
 						`${token.prefix || ""}${radius}${token.suffix || ""}`
 				)
 				.join(" ");
+
 			break;
 
 		case "shadow":
-			const shadowOffsetX = value.offset.x + "px ";
-			const shadowOffsetY = value.offset.y + "px ";
-			const shadowRadius = value.radius + "px ";
-			const shadowColorR = Math.round(value.color.r * 255);
-			const shadowColorG = Math.round(value.color.g * 255);
-			const shadowColorB = Math.round(value.color.b * 255);
-			const shadowColorA = roundToDecimal(value.color.a * 1, 3);
+			const shadowValue: Frame["effects"][0] = value;
+
+			if (typeof shadowValue !== "object")
+				throw new Error(
+					`The processValue ${token.processValue} need an object has value`
+				);
+
+			const shadowOffsetX = shadowValue.offset.x + "px ";
+			const shadowOffsetY = shadowValue.offset.y + "px ";
+			const shadowRadius = shadowValue.radius + "px ";
+			const shadowColorR = Math.round(shadowValue.color.r * 255);
+			const shadowColorG = Math.round(shadowValue.color.g * 255);
+			const shadowColorB = Math.round(shadowValue.color.b * 255);
+			const shadowColorA = roundToDecimal(shadowValue.color.a * 1, 3);
 			const shadowColor = `rgba(${shadowColorR}, ${shadowColorG}, ${shadowColorB}, ${shadowColorA})`;
 
 			processedToken =
@@ -123,6 +144,7 @@ const processToken = (value: any, token: Config["tokens"][0], frame: Frame) => {
 
 		default:
 			processedToken = "";
+
 			break;
 	}
 

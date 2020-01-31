@@ -1,9 +1,7 @@
 import { config } from "../config";
-import { Frame } from "../types/frame";
-// import { processTokens } from "./process-tokens";
 import { setupToken } from "./setup-token";
-import { writeFile } from "./write-file";
 import { tokensPage } from "./tokens-page";
+import { writeFile } from "./write-file";
 
 const { tokens } = config;
 

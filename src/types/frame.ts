@@ -25,13 +25,7 @@ export type Frame = {
 	strokes: {
 		type: string;
 	}[];
-	style: {
-		fontFamily: string;
-		fontPostScriptName: string;
-		fontSize: number;
-		fontWeight: number;
-		lineHeightPx: number;
-	};
+	style: { [key: string]: any };
 	styles: {
 		effect: string;
 		fill: string;

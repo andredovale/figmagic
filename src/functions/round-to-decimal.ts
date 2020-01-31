@@ -1,8 +1,5 @@
 export const roundToDecimal = (value: number, decimals?: number): number => {
-	if (
-		(typeof Number(value) === "number" && value < 0) ||
-		(typeof Number(value) !== "number" && !value)
-	)
+	if (Number.isNaN(Number(value)))
 		throw new Error("No number value provided to roundNumber()!");
 
 	if (!decimals) decimals = 0;
