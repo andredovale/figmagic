@@ -10,7 +10,7 @@
 		"salesforce theo"
 	],
 	"homepage": "https://www.figmagic.com",
-	"version": "1.0.29",
+	"version": "1.0.30",
 	"author": "Mikael Vesavuori",
 	"main": "dist/index.js",
 	"license": "MIT",
@@ -49,7 +49,7 @@
 	},
 	"husky": {
 		"hooks": {
-			"pre-commit": "echo Running pre-commit linting... && yarn test -o && pretty-quick --staged && npm --no-git-tag-version version patch && git add package.json"
+			"pre-commit": "echo Running pre-commit linting... && yarn test && pretty-quick --staged && npm --no-git-tag-version version patch && git add package.json"
 		}
 	}
 }
