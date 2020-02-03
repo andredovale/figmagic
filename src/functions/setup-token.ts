@@ -19,14 +19,14 @@ export const setupToken = (
 		if (token.style && !token.styleKey)
 			throw new Error("styleKey don't founded");
 
-		let key = name || _get(currentFrame, token.path);
+		let key = name || currentFrame.characters || currentFrame.name;
 
 		if (token.style) {
 			key = styles[_get(currentFrame, `styles.${token.styleKey}`)].name;
 		}
 
-		if (typeof key !== "string") {
-			key = currentFrame.characters || currentFrame.name;
+		if (!key) {
+			key = _get(currentFrame, token.path);
 		}
 
 		const parsedKey = stringParser(key, token.outputNameFormat);
@@ -37,7 +37,7 @@ export const setupToken = (
 				token,
 				currentFrame
 			);
-		} else if (!token.processValue) {
+		} else {
 			tokens[parsedKey] = `${token.prefix || ""}${_get(
 				currentFrame,
 				token.path
@@ -60,7 +60,6 @@ export const setupToken = (
 					for (const currentGroupFrame of (currentFrame as Page)
 						.children) {
 						recursive(currentGroupFrame);
-						// buildToken(currentGroupFrame, currentFrame.name);
 					}
 					return;
 				}
@@ -81,12 +80,11 @@ export const setupToken = (
 		let frames: Frame[] = [];
 
 		for (const frameName of token.frameName) {
-			frames.push(
-				page.children.filter(
-					frame =>
-						stringParser(frame.name) === stringParser(frameName)
-				)[0]
-			);
+			const filtered = page.children.filter(
+				frame => stringParser(frame.name) === stringParser(frameName)
+			)[0];
+
+			if (filtered) frames.push(filtered);
 		}
 
 		if (!frames.length) throw new Error("No frame for setupToken()!");

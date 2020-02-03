@@ -1600,7 +1600,6 @@ var getFromApi = function() {
 				case 0:
 					data = {};
 					url = apiBaseUrl$1 + figmaUrl$1;
-					console.log("TCL: getFromApi -> url", url);
 					return [
 						4 /*yield*/,
 						fetch(url, {
@@ -2605,7 +2604,8 @@ function get(object, path, defaultValue) {
 var get_1 = get;
 
 var roundToDecimal = function(value, decimals) {
-	if (!value) throw new Error("No number value provided to roundNumber()!");
+	if (Number.isNaN(Number(value)))
+		throw new Error("No number value provided to roundNumber()!");
 	if (!decimals) decimals = 0;
 	return Number(Math.round(Number(value + "e" + decimals)) + "e-" + decimals);
 };
@@ -2621,10 +2621,31 @@ var processToken = function(value, token, frame) {
 	}
 	switch (token.processValue) {
 		case "color":
-			var colorR = Math.round(value.r * 255);
-			var colorG = Math.round(value.g * 255);
-			var colorB = Math.round(value.b * 255);
-			var colorA = roundToDecimal(value.a * 1, 3);
+			var colorValue = value;
+			if (typeof colorValue !== "object")
+				throw new Error(
+					"The processValue " +
+						token.processValue +
+						" need an object has value"
+				);
+			var expectedKeys = ["r", "g", "b", "a"];
+			for (
+				var _i = 0, expectedKeys_1 = expectedKeys;
+				_i < expectedKeys_1.length;
+				_i++
+			) {
+				var expectedKey = expectedKeys_1[_i];
+				if (!Object.keys(colorValue).includes(expectedKey))
+					throw new Error(
+						"The value for 'color' don't have the '" +
+							expectedKey +
+							"' key"
+					);
+			}
+			var colorR = Math.round(colorValue.r * 255);
+			var colorG = Math.round(colorValue.g * 255);
+			var colorB = Math.round(colorValue.b * 255);
+			var colorA = roundToDecimal(colorValue.a * 1, 3);
 			processedToken =
 				"rgba(" +
 				colorR +
@@ -2637,29 +2658,49 @@ var processToken = function(value, token, frame) {
 				")";
 			break;
 		case "font":
+			var fontValue = value;
+			if (typeof fontValue !== "object")
+				throw new Error(
+					"The processValue " +
+						token.processValue +
+						" need an object has value"
+				);
 			var font = {};
-			for (var key in value) {
-				if (value.hasOwnProperty(key)) {
-					var element = value[key];
+			for (var key in fontValue) {
+				if (fontValue.hasOwnProperty(key)) {
+					var element = fontValue[key];
 					font[stringParser(key, token.outputNameFormat)] = element;
 				}
 			}
 			processedToken = font;
 			break;
 		case "grid":
+			var gridValue = value;
+			if (!Array.isArray(gridValue))
+				throw new Error(
+					"The processValue " +
+						token.processValue +
+						" need an array has value"
+				);
+			if (gridValue.length < 2)
+				throw new Error(
+					"The processValue " +
+						token.processValue +
+						" need the minimum of two items"
+				);
 			var grid = {
 				"column-count": 1,
 				"column-width": "100%",
 				gutter: "0%",
 				"min-width": "0px"
 			};
-			grid["column-count"] = value.length;
-			var columnWidth = value[0].absoluteBoundingBox.width;
+			grid["column-count"] = gridValue.length;
+			var columnWidth = gridValue[0].absoluteBoundingBox.width;
 			var canvasWidth = frame.absoluteBoundingBox.width;
 			grid["column-width"] = (columnWidth / canvasWidth) * 100 + "%";
 			grid.gutter =
-				((value[1].absoluteBoundingBox.x -
-					(value[0].absoluteBoundingBox.x + columnWidth)) /
+				((gridValue[1].absoluteBoundingBox.x -
+					(gridValue[0].absoluteBoundingBox.x + columnWidth)) /
 					canvasWidth) *
 					100 +
 				"%";
@@ -2667,7 +2708,14 @@ var processToken = function(value, token, frame) {
 			processedToken = grid;
 			break;
 		case "radius":
-			processedToken = value
+			var radiusValue = value;
+			if (!Array.isArray(radiusValue))
+				throw new Error(
+					"The processValue " +
+						token.processValue +
+						" need an array has value"
+				);
+			processedToken = radiusValue
 				.map(function(radius) {
 					return (
 						"" +
@@ -2679,13 +2727,20 @@ var processToken = function(value, token, frame) {
 				.join(" ");
 			break;
 		case "shadow":
-			var shadowOffsetX = value.offset.x + "px ";
-			var shadowOffsetY = value.offset.y + "px ";
-			var shadowRadius = value.radius + "px ";
-			var shadowColorR = Math.round(value.color.r * 255);
-			var shadowColorG = Math.round(value.color.g * 255);
-			var shadowColorB = Math.round(value.color.b * 255);
-			var shadowColorA = roundToDecimal(value.color.a * 1, 3);
+			var shadowValue = value;
+			if (typeof shadowValue !== "object")
+				throw new Error(
+					"The processValue " +
+						token.processValue +
+						" need an object has value"
+				);
+			var shadowOffsetX = shadowValue.offset.x + "px ";
+			var shadowOffsetY = shadowValue.offset.y + "px ";
+			var shadowRadius = shadowValue.radius + "px ";
+			var shadowColorR = Math.round(shadowValue.color.r * 255);
+			var shadowColorG = Math.round(shadowValue.color.g * 255);
+			var shadowColorB = Math.round(shadowValue.color.b * 255);
+			var shadowColorA = roundToDecimal(shadowValue.color.a * 1, 3);
 			var shadowColor =
 				"rgba(" +
 				shadowColorR +
@@ -2713,7 +2768,11 @@ var setupToken = function(token, page, styles) {
 			return;
 		if (token.style && !token.styleKey)
 			throw new Error("styleKey don't founded");
-		var key = name || get_1(currentFrame, token.path);
+		var key =
+			name ||
+			currentFrame.characters ||
+			currentFrame.name ||
+			get_1(currentFrame, token.path);
 		if (token.style) {
 			key = styles[get_1(currentFrame, "styles." + token.styleKey)].name;
 		}
@@ -2778,11 +2837,10 @@ var setupToken = function(token, page, styles) {
 	if (Array.isArray(token.frameName)) {
 		var frames_2 = [];
 		var _loop_1 = function(frameName) {
-			frames_2.push(
-				page.children.filter(function(frame) {
-					return stringParser(frame.name) === stringParser(frameName);
-				})[0]
-			);
+			var filtered = page.children.filter(function(frame) {
+				return stringParser(frame.name) === stringParser(frameName);
+			})[0];
+			if (filtered) frames_2.push(filtered);
 		};
 		for (var _i = 0, _a = token.frameName; _i < _a.length; _i++) {
 			var frameName = _a[_i];
