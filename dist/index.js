@@ -2764,20 +2764,25 @@ var processToken = function(value, token, frame) {
 var setupToken = function(token, page, styles) {
 	var tokens = {};
 	var buildToken = function(currentFrame, name) {
+		var _a, _b;
 		if (token.type && stringParser(currentFrame.type) !== token.type)
 			return;
 		if (token.style && !token.styleKey)
 			throw new Error("styleKey don't founded");
-		var key =
-			name ||
-			currentFrame.characters ||
-			currentFrame.name ||
-			get_1(currentFrame, token.path);
+		var key = name || currentFrame.characters || currentFrame.name;
 		if (token.style) {
-			key = styles[get_1(currentFrame, "styles." + token.styleKey)].name;
+			key =
+				((_b =
+					(_a =
+						styles[
+							get_1(currentFrame, "styles." + token.styleKey)
+						]) === null || _a === void 0
+						? void 0
+						: _a.name),
+				_b !== null && _b !== void 0 ? _b : undefined);
 		}
-		if (typeof key !== "string") {
-			key = currentFrame.characters || currentFrame.name;
+		if (!key) {
+			key = get_1(currentFrame, token.path);
 		}
 		var parsedKey = stringParser(key, token.outputNameFormat);
 		if (token.processValue) {
@@ -2786,7 +2791,7 @@ var setupToken = function(token, page, styles) {
 				token,
 				currentFrame
 			);
-		} else if (!token.processValue) {
+		} else {
 			tokens[parsedKey] =
 				"" +
 				(token.prefix || "") +
@@ -2818,7 +2823,6 @@ var setupToken = function(token, page, styles) {
 					) {
 						var currentGroupFrame = _c[_b];
 						recursive(currentGroupFrame);
-						// buildToken(currentGroupFrame, currentFrame.name);
 					}
 					return;
 				}

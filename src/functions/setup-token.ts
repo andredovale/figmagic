@@ -22,7 +22,9 @@ export const setupToken = (
 		let key = name || currentFrame.characters || currentFrame.name;
 
 		if (token.style) {
-			key = styles[_get(currentFrame, `styles.${token.styleKey}`)].name;
+			key =
+				styles[_get(currentFrame, `styles.${token.styleKey}`)]?.name ??
+				undefined;
 		}
 
 		if (!key) {

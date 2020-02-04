@@ -206,6 +206,40 @@ describe("It should build the token", () => {
 		expect(executed).toMatchObject(expected);
 	});
 
+	test("With token name from style, but the id don't exist", () => {
+		const executed = setupToken(
+			{
+				frameName: "lorem",
+				name: "ipsum",
+				path: "dolor",
+				style: true,
+				styleKey: "text"
+			},
+			{
+				children: [
+					({
+						children: [
+							{
+								dolor: "sit",
+								styles: {
+									text: "123"
+								}
+							}
+						],
+						name: "lorem"
+					} as unknown) as Frame
+				]
+			} as Page,
+			{
+				"456": {
+					name: "ipsum"
+				}
+			}
+		);
+		const expected = { sit: "sit" };
+		expect(executed).toMatchObject(expected);
+	});
+
 	test("With a preset of 'processToken's", () => {
 		const executed = setupToken(
 			{
