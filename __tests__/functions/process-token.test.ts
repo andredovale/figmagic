@@ -168,7 +168,84 @@ describe("It should return the processed token", () => {
 	});
 
 	test("With 'token.processValue' has font", () => {
-		const expected = { "lorem-ipsum": "dolor", "sit-amet": "et" };
+		const expected = { "font-family": "lorem", "font-weight": 300 };
+		expect(
+			processToken(
+				{ fontFamily: "lorem", fontWeight: 300 },
+				{
+					frameName: "lorem",
+					name: "ipsum",
+					path: "dolor",
+					processValue: "font"
+				},
+				{} as Frame
+			)
+		).toMatchObject(expected);
+
+		const expected2 = {
+			"font-size": "2.1rem",
+			"letter-spacing": "0.08rem",
+			"line-height": 1.38,
+			"text-align": "left"
+		};
+		expect(
+			processToken(
+				{
+					fontSize: 33.6,
+					letterSpacing: 0.08001,
+					lineHeightPercentFontSize: 138.001,
+					textAlignHorizontal: "LEFT"
+				},
+				{
+					frameName: "lorem",
+					name: "ipsum",
+					path: "dolor",
+					processValue: "font"
+				},
+				{} as Frame
+			)
+		).toMatchObject(expected2);
+
+		const expected3 = {
+			"font-family": "Roboto"
+		};
+		expect(
+			processToken(
+				{
+					fontFamily: "Roboto",
+					fontPostScriptName: "Roboto"
+				},
+				{
+					frameName: "lorem",
+					name: "ipsum",
+					path: "dolor",
+					processValue: "font"
+				},
+				{} as Frame
+			)
+		).toMatchObject(expected3);
+
+		const expected4 = {
+			"font-family": "Roboto, Roboto Light"
+		};
+		expect(
+			processToken(
+				{
+					fontFamily: "Roboto",
+					fontPostScriptName: "Roboto-Light"
+				},
+				{
+					frameName: "lorem",
+					name: "ipsum",
+					path: "dolor",
+					processValue: "font"
+				},
+				{} as Frame
+			)
+		).toMatchObject(expected4);
+	});
+
+	test("With 'token.processValue' has font, but without a valid font key", () => {
 		expect(
 			processToken(
 				{ loremIpsum: "dolor", sitAmet: "et" },
@@ -180,10 +257,10 @@ describe("It should return the processed token", () => {
 				},
 				{} as Frame
 			)
-		).toMatchObject(expected);
+		).toEqual({});
 	});
 
-	test("With 'token.processValue' has font and 'value' as an falsy key", () => {
+	test("With 'token.processValue' has font, and 'value' as an falsy key", () => {
 		expect(
 			processToken(
 				Object.create({ "": "" }),

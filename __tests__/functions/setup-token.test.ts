@@ -254,8 +254,8 @@ describe("It should build the token", () => {
 						children: [
 							{
 								style: {
-									loremIpsum: "dolor",
-									sitAmet: "et lament"
+									fontFamily: "dolor",
+									textAlignHorizontal: "LEFT"
 								},
 								name: "font style name"
 							}
@@ -268,8 +268,8 @@ describe("It should build the token", () => {
 		);
 		const expected = {
 			"font-style-name": {
-				"lorem-ipsum": "dolor",
-				"sit-amet": "et lament"
+				"font-family": "dolor",
+				"text-align": "left"
 			}
 		};
 		expect(executed).toMatchObject(expected);
