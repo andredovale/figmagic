@@ -180,6 +180,9 @@ var figmaJson = false;
 var figmaTokens = true;
 var outputColorFormat = "rgba";
 var outputCSSUnit = "em";
+var outputFigmaJsonPath = "figma";
+var outputFigmaJsonName = "figma";
+var outputFigmaTokensPath = "tokens";
 var outputNameFormat = "kebab";
 var tokens = [
 	{
@@ -255,6 +258,9 @@ var defaultConfig = {
 	figmaTokens: figmaTokens,
 	outputColorFormat: outputColorFormat,
 	outputCSSUnit: outputCSSUnit,
+	outputFigmaJsonPath: outputFigmaJsonPath,
+	outputFigmaJsonName: outputFigmaJsonName,
+	outputFigmaTokensPath: outputFigmaTokensPath,
 	outputNameFormat: outputNameFormat,
 	tokens: tokens
 };
@@ -274,7 +280,7 @@ argv
 			return coerce("format", value);
 		},
 		choices: ["css", "js", "json", "sass", "scss"],
-		default: "js",
+		default: config.format,
 		describe: "Choose a output format"
 	})
 	.option("config-file", {
@@ -321,6 +327,16 @@ argv
 		},
 		default: process.env.FIGMA_PAGE || config.figmaPage,
 		describe: "Name of tokens page on Figma",
+		required: false,
+		string: true
+	})
+	.option("output", {
+		alias: "o",
+		coerce: function(value) {
+			return coerce("outputFigmaTokensPath", value);
+		},
+		default: config.outputFigmaTokensPath,
+		describe: "Folder path for the generated tokens",
 		required: false,
 		string: true
 	}).argv;
@@ -1591,7 +1607,9 @@ var write = function(file, path, name, isToken) {
 var apiBaseUrl$1 = config.apiBaseUrl,
 	figmaJson$1 = config.figmaJson,
 	figmaUrl$1 = config.figmaUrl,
-	figmaToken$1 = config.figmaToken;
+	figmaToken$1 = config.figmaToken,
+	outputFigmaJsonPath$1 = config.outputFigmaJsonPath,
+	outputFigmaJsonName$1 = config.outputFigmaJsonName;
 var getFromApi = function() {
 	return __awaiter(void 0, void 0, void 0, function() {
 		var data, url;
@@ -1645,8 +1663,8 @@ var getFromApi = function() {
 																undefined,
 																2
 															),
-															"figma",
-															"figma",
+															outputFigmaJsonPath$1,
+															outputFigmaJsonName$1,
 															false
 														);
 													return [2 /*return*/];
@@ -2939,8 +2957,11 @@ var tokensPage = function(figmaPages) {
 	return correctPage;
 };
 
-var tokens$1 = config.tokens;
+var tokens$1 = config.tokens,
+	figmaTokens$1 = config.figmaTokens,
+	outputFigmaTokensPath$1 = config.outputFigmaTokensPath;
 var writeTokens = function(data) {
+	if (!figmaTokens$1) return;
 	if (!tokens$1 || !tokens$1.length)
 		throw new Error("Less than one token provided to writeTokens()!");
 	for (var _i = 0, tokens_1 = tokens$1; _i < tokens_1.length; _i++) {
@@ -2951,18 +2972,25 @@ var writeTokens = function(data) {
 			data.styles
 		);
 		if (processedToken)
-			writeFile(processedToken, "tokens", token.name, true);
+			writeFile(
+				processedToken,
+				outputFigmaTokensPath$1,
+				token.name,
+				true
+			);
 	}
 };
 
+var outputFigmaJsonPath$2 = config.outputFigmaJsonPath,
+	outputFigmaTokensPath$2 = config.outputFigmaTokensPath;
 (function() {
 	return __awaiter(void 0, void 0, void 0, function() {
 		var data;
 		return __generator(this, function(_a) {
 			switch (_a.label) {
 				case 0:
-					rimraf("./tokens", function() {});
-					rimraf("./figma", function() {});
+					rimraf("./" + outputFigmaJsonPath$2, function() {});
+					rimraf("./" + outputFigmaTokensPath$2, function() {});
 					return [4 /*yield*/, getFromApi()];
 				case 1:
 					data = _a.sent();

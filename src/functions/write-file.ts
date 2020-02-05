@@ -1,19 +1,12 @@
 import fs from "fs";
+
+import { Json, WriteFile } from "../types/common";
+import { config } from "../config";
+
 import { createFolder } from "./create-folder";
 import { stringParser } from "./parse-string";
 
-import { config } from "../config";
-
 const { format } = config;
-
-type Json = { err?: string; status?: string; [key: string]: any };
-
-type WriteFile = (
-	file: Json | string,
-	path: string,
-	name: string,
-	isToken?: boolean
-) => void;
 
 const writeFile: WriteFile = (file, path, name, isToken = false) => {
 	if (!file || !path || !name)

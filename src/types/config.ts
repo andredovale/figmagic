@@ -1,9 +1,9 @@
 export type Config = {
 	apiBaseUrl: string;
-	figmaJson: boolean;
+	figmaJson: boolean; // export or not the original JSON from Figma API
 	figmaUrl: string;
 	figmaToken: string;
-	figmaTokens: boolean;
+	figmaTokens: boolean; // export or not the tokens
 	figmaPage: string;
 	format: "css" | "js" | "json" | "sass" | "scss";
 	outputColorFormat: "hexadecimal" | "hsl" | "hsla" | "rgb" | "rgba";
@@ -23,6 +23,9 @@ export type Config = {
 		| "vmax"
 		| "vmin"
 		| "vw";
+	outputFigmaJsonPath: string; // folder path for the original JSON from Figma API
+	outputFigmaJsonName: string; // file name for the original JSON from Figma API
+	outputFigmaTokensPath: string; // folder path for the generated tokens
 	outputNameFormat: "camel" | "kebab" | "lower" | "snake" | "start" | "upper";
 	tokens: {
 		frameName: string | string[]; // frame identification name on Figma Page, direct son of the Page

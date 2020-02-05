@@ -13,22 +13,41 @@ jest.mock("../../src/functions/write-file", () => ({
 
 let writeTokens: Function;
 
+test("It should return undefined without 'figmaTokens' on 'config'", () => {
+	jest.mock("../../src/config", () => ({
+		config: {}
+	}));
+
+	jest.isolateModules(() => {
+		({ writeTokens } = require("../../src/functions/write-tokens"));
+	});
+
+	expect(writeTokens({})).toBeUndefined();
+});
+
 describe("It should throw an error", () => {
 	test("Without tokens on 'config'", () => {
 		jest.mock("../../src/config", () => ({
-			config: {}
+			config: {
+				figmaTokens: true
+			}
 		}));
 
 		jest.isolateModules(() => {
 			({ writeTokens } = require("../../src/functions/write-tokens"));
 		});
 
-		expect(() => writeTokens({})).toThrow();
+		expect(() => {
+			writeTokens({});
+		}).toThrow();
 	});
 
 	test("Without length in tokens on 'config'", () => {
 		jest.mock("../../src/config", () => ({
-			config: { tokens: [] }
+			config: {
+				figmaTokens: true,
+				tokens: []
+			}
 		}));
 
 		jest.isolateModules(() => {
@@ -47,7 +66,10 @@ afterEach(() => {
 
 test("It should succeed to write files", () => {
 	jest.mock("../../src/config", () => ({
-		config: { tokens: [{}] }
+		config: {
+			figmaTokens: true,
+			tokens: [{}]
+		}
 	}));
 
 	(<jest.Mock>setupToken).mockReturnValueOnce("Lorem Ipsum");
@@ -63,7 +85,10 @@ test("It should succeed to write files", () => {
 
 test("It shouldn't succeed to write files", () => {
 	jest.mock("../../src/config", () => ({
-		config: { tokens: [{}] }
+		config: {
+			figmaTokens: true,
+			tokens: [{}]
+		}
 	}));
 
 	(<jest.Mock>setupToken).mockReturnValueOnce("");

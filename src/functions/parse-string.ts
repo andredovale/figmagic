@@ -4,8 +4,9 @@ import _lowerCase from "lodash/lowerCase";
 import _snakeCase from "lodash/snakeCase";
 import _startCase from "lodash/startCase";
 import _upperCase from "lodash/upperCase";
-import { config } from "../config";
+
 import { Config } from "../types/config";
+import { config } from "../config";
 
 const { outputNameFormat } = config;
 

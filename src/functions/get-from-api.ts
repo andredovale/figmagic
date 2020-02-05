@@ -1,11 +1,18 @@
 import fetch from "node-fetch";
 
+import { Json } from "../types/common";
 import { config } from "../config";
+
 import { writeFile } from "./write-file";
 
-const { apiBaseUrl, figmaJson, figmaUrl, figmaToken } = config;
-
-type Json = { err?: string; status?: string; [key: string]: any };
+const {
+	apiBaseUrl,
+	figmaJson,
+	figmaUrl,
+	figmaToken,
+	outputFigmaJsonPath,
+	outputFigmaJsonName
+} = config;
 
 export const getFromApi = async () => {
 	let data: Json = {};
@@ -36,8 +43,8 @@ export const getFromApi = async () => {
 			if (figmaJson)
 				writeFile(
 					JSON.stringify(json, undefined, 2),
-					"figma",
-					"figma",
+					outputFigmaJsonPath,
+					outputFigmaJsonName,
 					false
 				);
 		});

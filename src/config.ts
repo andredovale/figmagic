@@ -1,8 +1,9 @@
-import argv from "yargs";
 import dotenv from "dotenv";
 import fs from "fs";
+import argv from "yargs";
 
 import defaultConfig from "../.figmagic.json";
+
 import { Config } from "./types/config.js";
 
 dotenv.config();
@@ -24,7 +25,7 @@ argv
 		alias: "f",
 		coerce: (value: string) => coerce("format", value),
 		choices: ["css", "js", "json", "sass", "scss"],
-		default: "js",
+		default: config.format,
 		describe: "Choose a output format"
 	})
 	.option("config-file", {
@@ -66,6 +67,14 @@ argv
 		coerce: (value: string) => coerce("figmaPage", value),
 		default: process.env.FIGMA_PAGE || config.figmaPage,
 		describe: "Name of tokens page on Figma",
+		required: false,
+		string: true
+	})
+	.option("output", {
+		alias: "o",
+		coerce: (value: string) => coerce("outputFigmaTokensPath", value),
+		default: config.outputFigmaTokensPath,
+		describe: "Folder path for the generated tokens",
 		required: false,
 		string: true
 	}).argv;
