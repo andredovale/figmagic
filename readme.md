@@ -2,7 +2,7 @@
 
 This library is based in the original [Figmagic](https://github.com/mikaelvesavuori/figmagic) by [Mikael Vesavuori](https://github.com/mikaelvesavuori).
 
-[![Build Status](https://travis-ci.org/andredovale/figmagic.svg?branch=feature/docs)](https://travis-ci.org/andredovale/figmagic)
+[![Build Status](https://travis-ci.org/andredovale/figmagic.svg)](https://travis-ci.org/andredovale/figmagic)
 
 ---
 
