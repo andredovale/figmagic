@@ -21,5 +21,8 @@ export const tokensPage = (figmaPages: Page[]): Page => {
 		}
 	}
 
+	if (!correctPage)
+		throw new Error(`No page founded width the name "${figmaPage}"`);
+
 	return correctPage as Page;
 };

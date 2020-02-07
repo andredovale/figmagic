@@ -21,15 +21,15 @@ describe("It should throw an error", () => {
 			tokensPage([]);
 		}).toThrow();
 	});
+
+	test("Without the correct page", () => {
+		expect(() => {
+			tokensPage([{ name: "Lorem ipsum dolor" } as Page]);
+		}).toThrow();
+	});
 });
 
 describe("It should return", () => {
-	test("An undefined value", () => {
-		expect(
-			tokensPage([{ name: "Lorem ipsum dolor" } as Page])
-		).toBeUndefined();
-	});
-
 	test("The correct page", () => {
 		const mock = { name: "DesignTokens" };
 		expect(tokensPage([mock as Page])).toMatchObject({

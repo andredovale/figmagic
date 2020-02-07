@@ -2954,6 +2954,8 @@ var tokensPage = function(figmaPages) {
 			break;
 		}
 	}
+	if (!correctPage)
+		throw new Error('No page founded width the name "' + figmaPage$1 + '"');
 	return correctPage;
 };
 

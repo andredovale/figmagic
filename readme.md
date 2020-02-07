@@ -12,7 +12,7 @@ Extract design tokens for any value in Figma. A typical use case for the generat
 
 ## .figmagic.json
 
-Figmagic have a default `.figmagic.json`, and, to work without modifications requires that your document structure is identical to the template at <https://www.figma.com/file/${new-url}>.
+Figmagic have a default `.figmagic.json`, and, to work without modifications requires that your document structure is identical to the template available at [Figma example project].
 
 But, if you need to extend and modify the default settings, create a file named `.figmagic.json` in the same level where you are using the cli command `figmagic`, and use the option `--config-file` (or only `-c`).
 
@@ -73,7 +73,7 @@ Your structure needs to correspond to the following:
 - Further, inside the "Design Tokens" page, frames need to be exist. Is the same names inside the `tokens` collection in `.figmagic.json`.
 - All items on a page need to be contained within one or more frames
 
-See a demo/template at <https://www.figma.com/file/${new-url}>. Feel free to simply copy it and paste it into your own document.
+See a demo/template at [Figma example project]. Feel free to simply copy it and paste it into your own document.
 
 **Note:** Refer to the the document structure in the image below and in the template linked above.
 
@@ -119,3 +119,5 @@ A: You are very welcome to contribute to the project! Pull requests welcome, as 
 - [ ] Implement another colors formats;
 - [ ] Implement another css units;
 - [ ] Implement the option to specifc the `key` to use as name for the token.
+
+[figma example project]: https://www.figma.com/file/WxG6QtKZKH4WqSRZX5xm8B
