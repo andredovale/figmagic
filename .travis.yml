@@ -8,10 +8,13 @@ os:
     - osx
 
 script:
-    - npm run setup
+    - yarn build
+    - yarn setup
     - figmagic
+    - \[ -d figma \]
+    - \[ -f figma/figma.js \]
     - \[ -d tokens \]
-    - \[ -f tokens/animation.js \]
+    - \[ -f tokens/colors.js \]
 
 notifications:
     email: false
