@@ -14,7 +14,7 @@ Extract design tokens for any value in Figma. A typical use case for the generat
 
 Figmagic have a default `.figmagic.json`, and, to work without modifications requires that your document structure is identical to the template at <https://www.figma.com/file/${new-url}>.
 
-But, if you need to extend and modify the default settings, create a file named `.figmagic.json` in the same level where you are using the cli command `figmagic`.
+But, if you need to extend and modify the default settings, create a file named `.figmagic.json` in the same level where you are using the cli command `figmagic`, and use the option `--config-file` (or only `-c`).
 
 Open the [.figmagic.json](.figmagic.json) to view the default values, and see the [src/types/config.ts](src/types/config.ts) to understand the structure of this file.
 
@@ -57,13 +57,13 @@ Off course, ensure your `.env` file isn't versioned (see this in your `.gitignor
 
 ---
 
-### Installation
+## Installation
 
 - Clone Figmagic
-- Step into the Figmagic directory, and run `yarn setup` or `npm setup` to add it globally to your system
+- Step into the Figmagic directory, and run `yarn setup` or `npm run setup` to add it globally to your system
 - Step into a project directory, and add or replace **FIGMA_URL** and **FIGMA_TOKEN** in .env with your own file ID and token key (for more on this, [go to Figma's developer docs](https://www.figma.com/developers/docs))
-- Run `figmagic` (default is token files), or `figmagic js` if you want to have regular old .JS files instead
-- You should now have a `/figma` and `/tokens` folder in the root! The `/tokens` folder has the good stuff you want :)
+- Run `figmagic`
+- You should now have a `/tokens` folder in the root! The `/tokens` folder has the good stuff you want
 
 ## Figma setup
 
