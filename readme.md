@@ -114,5 +114,8 @@ A: You are very welcome to contribute to the project! Pull requests welcome, as 
 
 ## TO DO list
 
-- [ ] Export Figma JSON as `.json` (currently is `.js`);
+- [ ] Export Figma JSON as `.json` (currently is the same type from `format` option of `.figmagic.json` );
 - [ ] Implement another outputs formats (as `.sass` or `.scss`, `.less`, `.json` etc);
+- [ ] Implement another colors formats;
+- [ ] Implement another css units;
+- [ ] Implement the option to specifc the `key` to use as name for the token.
