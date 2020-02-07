@@ -14,7 +14,7 @@ Extract design tokens for any value in Figma. A typical use case for the generat
 
 Figmagic have a default `.figmagic.json`, and, to work without modifications requires that your document structure is identical to the template at <https://www.figma.com/file/${new-url}>.
 
-But, if you need to exted and modify the default settings, create a file named `.figmagic.json` in the same level where you are using the cli command `figmagic`.
+But, if you need to extend and modify the default settings, create a file named `.figmagic.json` in the same level where you are using the cli command `figmagic`.
 
 Open the [.figmagic.json](.figmagic.json) to view the default values, and see the [src/types/config.ts](src/types/config.ts) to understand the structure of this file.
 
@@ -34,7 +34,7 @@ Options:
 | `--help, -h` | Show help | `boolean` | | `false` |
 | `--version, -v` | Show version number | `boolean` | | `false` |
 | `--format, -f` | Choose a output format | `string` | `"css"`, `"js"`, `"json"`, `"sass"`, `"scss"` | `"js"` |
-| `--config-file, -c` | Extend and modify the default config file: .figmagic.json | `boolean` | | `false` |
+| `--config-file, -c` | Extend and modify the default config file: `.figmagic.json` | `boolean` | | `false` |
 | `--figma-url, -u` | Figma project identification URI | `string` | | `""` |
 | `--figma-token, -t` | Figma development API authorization token | `string` | | `""` |
 | `--figma-page, -p` | Name of tokens page on Figma | `string` | | `"Design Tokens"` |
@@ -48,7 +48,7 @@ If you need to secure your Figma input data, is possible to use a enviroment fil
 
 Options:
 | Variable | Description | Type |
-|-------------------|-----------------------------------------------------------|:-------:|:-----------------------------------:|:-------------:|
+|-------------------|-----------------------------------------------------------|:-------:|
 | `FIGMA_URL` | Figma project identification URI | `string` |
 | `FIGMA_TOKEN` | Figma development API authorization token | `string` |
 | `FIGMA_PAGE` | Name of tokens page on Figma | `string` |

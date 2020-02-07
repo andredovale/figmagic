@@ -11,10 +11,8 @@ script:
     - yarn build
     - yarn setup
     - figmagic
-    - \[ -d figma \]
-    - \[ -f figma/figma.js \]
     - \[ -d tokens \]
-    - \[ -f tokens/colors.js \]
+    - \[ -f tokens/animation.js \]
 
 notifications:
     email: false
