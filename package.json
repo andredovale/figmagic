@@ -10,12 +10,14 @@
 		"salesforce theo"
 	],
 	"homepage": "https://www.figmagic.com",
-	"version": "1.0.31",
+	"version": "1.0.33",
 	"author": "Mikael Vesavuori",
 	"main": "dist/index.js",
 	"license": "MIT",
 	"devDependencies": {
+		"@rollup/plugin-commonjs": "^11.0.2",
 		"@rollup/plugin-json": "^4.0.2",
+		"@rollup/plugin-node-resolve": "^7.1.1",
 		"@types/jest": "^25.1.1",
 		"@types/lodash": "^4.14.149",
 		"@types/node-fetch": "^2.5.4",
@@ -25,9 +27,7 @@
 		"prettier": "^1.16.4",
 		"pretty-quick": "^2.0.1",
 		"rollup": "^1.31.0",
-		"rollup-plugin-commonjs": "^10.1.0",
-		"rollup-plugin-node-resolve": "^5.2.0",
-		"rollup-plugin-typescript2": "^0.25.3",
+		"rollup-plugin-typescript2": "^0.26.0",
 		"ts-jest": "^25.1.0",
 		"typescript": "^3.7.5"
 	},
@@ -42,8 +42,8 @@
 		"figmagic": "./dist/index.js"
 	},
 	"scripts": {
-		"build": "rollup -c && chmod u+x dist/index.js",
-		"setup": "rm -rf yarn.lock node_modules/ /usr/local/lib/node_modules/figmagic && npm install -g",
+		"build": "rollup -c",
+		"setup": "rimraf yarn.lock node_modules/ /usr/local/lib/node_modules/figmagic && npm install -g",
 		"figmagic": "node ./dist/index",
 		"test": "npx jest"
 	},

@@ -7,21 +7,21 @@ jest.mock("../../src/config", () => ({
 }));
 
 describe("It should throw an error", () => {
-	test("Without first parameter", () => {
+	test("Without 'file'", () => {
 		expect(() => {
 			// @ts-ignore
 			writeFile(undefined, "lorem", "ipsum");
 		}).toThrow();
 	});
 
-	test("Without second parameter", () => {
+	test("Without 'path'", () => {
 		expect(() => {
 			// @ts-ignore
 			writeFile("lorem", undefined, "ipsum");
 		}).toThrow();
 	});
 
-	test("Without third parameter", () => {
+	test("Without 'name'", () => {
 		expect(() => {
 			// @ts-ignore
 			writeFile("lorem", "ipsum", undefined);

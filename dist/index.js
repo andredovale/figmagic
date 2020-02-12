@@ -1622,7 +1622,7 @@ var getFromApi = function() {
 												case 0:
 													if (response.status !== 200)
 														throw new Error(
-															"Error to get Figma metadata from API"
+															"Error getting Figma metadata from API"
 														);
 													return [
 														4 /*yield*/,
@@ -2768,7 +2768,7 @@ var setupToken = function(token, page, styles) {
 		if (token.type && stringParser(currentFrame.type) !== token.type)
 			return;
 		if (token.style && !token.styleKey)
-			throw new Error("styleKey don't founded");
+			throw new Error("styleKey not found");
 		var key = name || currentFrame.characters || currentFrame.name;
 		if (token.style) {
 			key =

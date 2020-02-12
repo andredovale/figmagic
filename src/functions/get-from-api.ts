@@ -22,7 +22,7 @@ export const getFromApi = async () => {
 		})
 		.then(async response => {
 			if (response.status !== 200)
-				throw new Error("Error to get Figma metadata from API");
+				throw new Error("Error getting Figma metadata from API");
 
 			const json: Json = await response.json();
 

@@ -17,7 +17,7 @@ export const setupToken = (
 			return;
 
 		if (token.style && !token.styleKey)
-			throw new Error("styleKey don't founded");
+			throw new Error("styleKey not found");
 
 		let key = name || currentFrame.characters || currentFrame.name;
 
