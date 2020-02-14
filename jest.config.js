@@ -1,10 +1,6 @@
 module.exports = {
-	//preset: 'jest-puppeteer',
-	transform: {
-		'^.+\\.mjs$': 'babel-jest'
-	},
-	moduleFileExtensions: ['js', 'mjs'],
-	rootDir: '__tests__/',
-	//setupFilesAfterEnv: '<rootDir>/setup.js',
-	testMatch: ['**/*.test.+(js|mjs)']
+	collectCoverage: true,
+	collectCoverageFrom: ["src/**/*.ts", "!**/node_modules/**"],
+	preset: "ts-jest",
+	testEnvironment: "node"
 };
