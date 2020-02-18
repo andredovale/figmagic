@@ -7,9 +7,9 @@ function _interopDefault(ex) {
 
 var rimraf = _interopDefault(require("rimraf"));
 var fetch = _interopDefault(require("node-fetch"));
-var argv = _interopDefault(require("yargs"));
 var dotenv = _interopDefault(require("dotenv"));
 var fs = _interopDefault(require("fs"));
+var argv = _interopDefault(require("yargs"));
 
 /*! *****************************************************************************
 Copyright (c) Microsoft Corporation. All rights reserved.
