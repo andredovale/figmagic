@@ -2666,10 +2666,64 @@ var processToken = function(value, token, frame) {
 						" need an object has value"
 				);
 			var font = {};
-			for (var key in fontValue) {
-				if (fontValue.hasOwnProperty(key)) {
-					var element = fontValue[key];
-					font[stringParser(key, token.outputNameFormat)] = element;
+			var keys = ["fontFamily", "fontWeight"];
+			var keysFromTo = [
+				{
+					from: "fontSize",
+					to: "font-size",
+					processKey: function(value) {
+						return roundToDecimal(value / 16, 4) + "rem";
+					}
+				},
+				{
+					from: "letterSpacing",
+					to: "letter-spacing",
+					processKey: function(value) {
+						return roundToDecimal(value, 4) + "rem";
+					}
+				},
+				{
+					from: "lineHeightPercentFontSize",
+					to: "line-height",
+					processKey: function(value) {
+						return roundToDecimal(value / 100, 4);
+					}
+				},
+				{
+					from: "textAlignHorizontal",
+					to: "text-align",
+					processKey: function(value) {
+						return value.toLowerCase();
+					}
+				}
+			];
+			for (var _a = 0, keys_1 = keys; _a < keys_1.length; _a++) {
+				var key = keys_1[_a];
+				if (fontValue[key]) {
+					font[stringParser(key, "kebab")] = fontValue[key];
+				}
+			}
+			if (fontValue.fontPostScriptName) {
+				if (
+					font["font-family"] &&
+					fontValue.fontPostScriptName !== font["font-family"]
+				) {
+					font["font-family"] =
+						font["font-family"] +
+						", " +
+						stringParser(fontValue.fontPostScriptName, "start");
+				} else {
+					font["font-family"] = fontValue.fontPostScriptName;
+				}
+			}
+			for (
+				var _b = 0, keysFromTo_1 = keysFromTo;
+				_b < keysFromTo_1.length;
+				_b++
+			) {
+				var key = keysFromTo_1[_b];
+				if (fontValue[key.from]) {
+					font[key.to] = key.processKey(fontValue[key.from]);
 				}
 			}
 			processedToken = font;

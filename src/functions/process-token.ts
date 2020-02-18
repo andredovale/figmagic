@@ -52,12 +52,59 @@ const processToken = (value: any, token: Config["tokens"][0], frame: Frame) => {
 				);
 
 			const font: { [key: string]: any } = {};
-			for (const key in fontValue) {
-				if (fontValue.hasOwnProperty(key)) {
-					const element = fontValue[key];
-					font[stringParser(key, token.outputNameFormat)] = element;
+
+			const keys = ["fontFamily", "fontWeight"];
+			const keysFromTo = [
+				{
+					from: "fontSize",
+					to: "font-size",
+					processKey: (value: number) =>
+						`${roundToDecimal(value / 16, 4)}rem`
+				},
+				{
+					from: "letterSpacing",
+					to: "letter-spacing",
+					processKey: (value: number) =>
+						`${roundToDecimal(value, 4)}rem`
+				},
+				{
+					from: "lineHeightPercentFontSize",
+					to: "line-height",
+					processKey: (value: number) =>
+						roundToDecimal(value / 100, 4)
+				},
+				{
+					from: "textAlignHorizontal",
+					to: "text-align",
+					processKey: (value: string) => value.toLowerCase()
+				}
+			];
+
+			for (const key of keys) {
+				if (fontValue[key]) {
+					font[stringParser(key, "kebab")] = fontValue[key];
 				}
 			}
+
+			if (fontValue.fontPostScriptName) {
+				if (
+					font["font-family"] &&
+					fontValue.fontPostScriptName !== font["font-family"]
+				) {
+					font["font-family"] = `${
+						font["font-family"]
+					}, ${stringParser(fontValue.fontPostScriptName, "start")}`;
+				} else {
+					font["font-family"] = fontValue.fontPostScriptName;
+				}
+			}
+
+			for (const key of keysFromTo) {
+				if (fontValue[key.from]) {
+					font[key.to] = key.processKey(<never>fontValue[key.from]);
+				}
+			}
+
 			processedToken = font;
 			break;
 
