@@ -335,7 +335,6 @@ argv
 		coerce: function(value) {
 			return coerce("outputFigmaTokensPath", value);
 		},
-		default: config.outputFigmaTokensPath,
 		describe: "Folder path for the generated tokens",
 		required: false,
 		string: true
@@ -2844,14 +2843,15 @@ var setupToken = function(token, page, styles) {
 		var key = name || currentFrame.characters || currentFrame.name;
 		if (token.style) {
 			key =
-				((_b =
+				(_b =
 					(_a =
 						styles[
 							get_1(currentFrame, "styles." + token.styleKey)
 						]) === null || _a === void 0
 						? void 0
-						: _a.name),
-				_b !== null && _b !== void 0 ? _b : undefined);
+						: _a.name) !== null && _b !== void 0
+					? _b
+					: undefined;
 		}
 		if (!key) {
 			key = get_1(currentFrame, token.path);

@@ -73,7 +73,6 @@ argv
 	.option("output", {
 		alias: "o",
 		coerce: (value: string) => coerce("outputFigmaTokensPath", value),
-		default: config.outputFigmaTokensPath,
 		describe: "Folder path for the generated tokens",
 		required: false,
 		string: true

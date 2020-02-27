@@ -10,7 +10,7 @@
 		"salesforce theo"
 	],
 	"homepage": "https://www.figmagic.com",
-	"version": "1.0.35",
+	"version": "1.0.36",
 	"author": "Mikael Vesavuori",
 	"main": "dist/index.js",
 	"license": "MIT",
@@ -45,7 +45,7 @@
 		"build": "rollup -c",
 		"setup": "rimraf yarn.lock node_modules/ /usr/local/lib/node_modules/figmagic && npm install -g",
 		"figmagic": "node ./dist/index",
-		"test": "npx jest"
+		"test": "jest"
 	},
 	"husky": {
 		"hooks": {
