@@ -1,12 +1,12 @@
 export type Config = {
-	apiBaseUrl: string; // Base URL from Figma API
+	apiBaseUrl: string; // Figma API base URL
 	figmaJson: boolean; // Export or not the original JSON from Figma API
-	figmaUrl: string; // URL from the project you need to extract the tokens
-	figmaToken: string; // Your user token from Figma to connect on Figma API
+	figmaUrl: string; // Figma's file URL param
+	figmaToken: string; // Your Figma's user token to connect with API
 	figmaTokens: boolean; // Export or not the tokens
-	figmaPage: string; // Page from project to extract the tokens
+	figmaPage: string; // Project page to extract tokens
 	format: "css" | "js" | "json" | "sass" | "scss"; // TODO: Output format for tokens
-	outputColorFormat: "hexadecimal" | "hsl" | "hsla" | "rgb" | "rgba"; // TODO: Prefered format color to output the tokens (work with `token[#].processValue = "color";`)
+	outputColorFormat: "hexadecimal" | "hsl" | "hsla" | "rgb" | "rgba"; // TODO: Prefered format color to output tokens (work with `token[#].processValue = "color";`)
 	outputCSSUnit:
 		| "cm"
 		| "in"
@@ -38,10 +38,10 @@ export type Config = {
 		outputCSSUnit?: Config["outputCSSUnit"]; // Token specific css unit
 		outputNameFormat?: Config["outputNameFormat"]; // Token specific string case
 		prefix?: string; // String to concatenate before the value of tokens
-		processValue?: "color" | "font" | "grid" | "radius" | "shadow"; // Help functions to auxiliate in process the token value
-		suffix?: string; // String to concatenate after the value of tokens
-		style?: boolean; // Use style id to generate the token; with this: 1 the `path` options is ignored; 2. and the `styleKey` is necessary;
-		styleKey?: "fill" | "text" | "effect" | "grid"; // Select the key from style object to find the style key
-		type?: "group" | "rectangle" | "text"; // Specific the type object to find the token
+		processValue?: "color" | "font" | "grid" | "radius" | "shadow"; // Help functions to process the token value
+		suffix?: string; // String to concatenate after token's value
+		style?: boolean; // Used to named the token;
+		styleKey?: "fill" | "text" | "effect" | "grid"; // Select key from style object to find the style key
+		type?: "group" | "rectangle" | "text"; // Specify the object type to find the token
 	}[];
 };
