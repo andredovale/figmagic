@@ -22,22 +22,22 @@ export type Config = {
 		| "vh"
 		| "vmax"
 		| "vmin"
-		| "vw"; // TODO: Prefered css unit to output the tokens
-	outputFigmaJsonPath: string; // Folder path for the original JSON from Figma API
-	outputFigmaJsonName: string; // File name for the original JSON from Figma API
-	outputFigmaTokensPath: string; // Folder path for the generated tokens
-	outputNameFormat: "camel" | "kebab" | "lower" | "snake" | "start" | "upper"; // Prefered string case to output the tokens keys
+		| "vw"; // TODO: Prefered css unit to output tokens
+	outputFigmaJsonPath: string; // Folder's path of the original JSON file from Figma Api
+	outputFigmaJsonName: string; // Name of the original JSON file from Figma API
+	outputFigmaTokensPath: string; // Generated tokens folder's path
+	outputNameFormat: "camel" | "kebab" | "lower" | "snake" | "start" | "upper"; // String case prefered to output tokens keys
 	tokens: {
-		frameName: string | string[]; // Frame identification name on Figma Page (needed as direct child from page)
-		name: string; // Name of the file to output this token
-		path: string; // Path of the value for this token, in the same format from `lodash.get`
-		fallback?: string; // Used for cases when the path don't exist, but need to return a value to token
-		group?: boolean; // If true, group name to be the key
-		key?: string; // TODO: The key, sibling of the value on 'path' to be the token key; if group is true, this isn't necessary
-		outputColorFormat?: Config["outputColorFormat"]; // Token specific format color
+		frameName: string | string[]; // Frame's name on Figma page (required as direct child from page)
+		name: string; // File name to output this token
+		path: string; // Value's path of this token. "lodash.get" same format
+		fallback?: string; // Used when the path doesn't exists, but need to return a value to this token
+		group?: boolean; // If true, group name will be the token key
+		key?: string; // TODO: JSON file key who will be used to give this token a name. This key needs to be a sibling propperty of attribute 'path'
+		outputColorFormat?: Config["outputColorFormat"]; // Token specific color format
 		outputCSSUnit?: Config["outputCSSUnit"]; // Token specific css unit
 		outputNameFormat?: Config["outputNameFormat"]; // Token specific string case
-		prefix?: string; // String to concatenate before the value of tokens
+		prefix?: string; // String to concatenate before token's values
 		processValue?: "color" | "font" | "grid" | "radius" | "shadow"; // Help functions to process the token value
 		suffix?: string; // String to concatenate after token's value
 		style?: boolean; // Used to named the token;
