@@ -8,7 +8,8 @@ os:
     - osx
 
 script:
-    - npm run setup
+    - yarn build
+    - yarn setup
     - figmagic
     - \[ -d tokens \]
     - \[ -f tokens/animation.js \]

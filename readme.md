@@ -1,62 +1,85 @@
 # Figmagic
 
-[![Build Status](https://travis-ci.org/mikaelvesavuori/figmagic.svg?branch=master)](https://travis-ci.org/mikaelvesavuori/figmagic)
+Based on the original [Figmagic](https://github.com/mikaelvesavuori/figmagic) by [Mikael Vesavuori](https://github.com/mikaelvesavuori).
 
-Automate the generation of design tokens and specs from your Figma documents. Inspired by [Salesforce Theo](https://github.com/salesforce-ux/theo).
+[![Build Status](https://travis-ci.org/andredovale/figmagic.svg)](https://travis-ci.org/andredovale/figmagic)
 
-Extract design tokens for colors, typography (line heights, font sizes, font families), and spacing. A typical use case for the generated documents is to use the extracted values as a token base in CSS systems that support external values (such as Styled Components, other CSS-in-JS libraries, or Sass).
+---
 
-Figmagic uses ESM imports, so make sure you have a recent Node version, preferably version 10+.
+Extract design tokens from any value in Figma. A typical use case for the generated documents is to use the extracted values as a token base in CSS systems that support external values (such as Styled Components, other CSS-in-JS libraries, or Sass).
 
-**Please note:** Figmagic requires that your document structure is identical to what I show in the template site at [https://www.figma.com/file/UkrKTnjjKB0lJKYAifn9YWXU/Figmagic---Design-Token-Example-v1.0](https://www.figma.com/file/UkrKTnjjKB0lJKYAifn9YWXU/Figmagic---Design-Token-Example-v1.0).
+---
 
-_Built initially as an internal handoff tool for [Humblebee](https://www.humblebee.se)._
+## .figmagic.json
 
-## Major changes between pre-1.0 versions and 1.0
+Figmagic has a default `.figmagic.json`, and, to work without modifications requires that your document structure is identical to the template available at [Figma example project].
 
-Figmagic versions pre-1.0 were primarily used as an in-house, internal tool at Humblebee. The focus was therefore less on being a good, general tool and didn't enjoy any large amount of testing and so on. The goal with 1.0 has been to minimize any friction in using, implementing and trusting Figmagic for your design token needs.
+But, if you need to extend the default settings, create a file named `.figmagic.json` in the same level where you are using the command line `figmagic`, and use the option `--config-file` (or `-c`).
 
--   With version 1.0, the scope has been focused only on generating design tokens. If you relied on Figmagic to generate specs, or component renders (etc.) then none of those functions exist in this, new version.
--   It should now also work on Windows, since we don't rely on Bash scripts anymore. Cross-platform for the win!
--   Much easier to install and use, since it's a global module rather than a crappily-crafted dependency that's going to break on you whenever there's an update.
--   More error handling, thank God for that...
+Open the [.figmagic.json](.figmagic.json) to view the default values, and see the [src/types/config.ts](src/types/config.ts) to understand the structure of this file.
 
-Note: I've kept the old design system template around, but also updated with a new one to correspond with changes in version 1.0+.
+---
 
-## Approach and use cases
+## CLI
 
-There's a lot to say here about the use cases and approaches taken by other tools. I will be writing an article on the motivations behind the project later on.
+Base command:
 
-The basic idea of Figmagic is to support an informed handoff between designers and developers. I believe the best way to do this in a solid, mature, and non-impeding way is:
+```(cli)
+figmagic
+```
 
--   Expect relative and current value types that are optimally suited for each typology (unitless for line heights, rems for font sizes...). Don't use or expect px values in most cases.
--   Transform values into a common set of tokens rather than output exact values, ie. use something like \${colors.midGray} rather than #3C3C3C.
+Options:
+| Command | Description | Type | Accepted values | Default value |
+|-------------------|-----------------------------------------------------------|:-------:|:-----------------------------------:|:-------------:|
+| `--help, -h` | Show help | `boolean` | | `false` |
+| `--version, -v` | Show version number | `boolean` | | `false` |
+| `--format, -f` | Choose a output format | `string` | `"css"`, `"js"`, `"json"`, `"sass"`, `"scss"` | `"js"` |
+| `--config-file, -c` | Extend the default configuration file: `.figmagic.json` | `boolean` | | `false` |
+| `--figma-url, -u` | Figma project identification URI | `string` | | `""` |
+| `--figma-token, -t` | Figma development API authorization token | `string` | | `""` |
+| `--figma-page, -p` | Name of tokens page on Figma | `string` | | `"Design Tokens"` |
+| `--output, -o` | Folder path for the generated tokens | `string` | | `"tokens"` |
 
-## Example project
+---
 
-An example project—using React, Webpack and Styled Components—is available at [https://github.com/mikaelvesavuori/figmagic-example](https://github.com/mikaelvesavuori/figmagic-example).
+## .env
 
-### Installation
+If you need to secure your Figma input data, is possible to use a environment file named `.env` in the same level where you are using the cli command `figmagic`.
 
--   Clone Figmagic
--   Step into the Figmagic directory, and run `yarn setup` or `npm setup` to add it globally to your system
--   Step into a project directory, and add or replace **FIGMA_URL** and **FIGMA_TOKEN** in .env with your own file ID and token key (for more on this, [go to Figma's developer docs](https://www.figma.com/developers/docs))
--   Run `figmagic` (default is token files), or `figmagic js` if you want to have regular old .JS files instead
--   You should now have a `/figma` and `/tokens` folder in the root! The `/tokens` folder has the good stuff you want :)
+Options:
+| Variable | Description | Type |
+|-------------------|-----------------------------------------------------------|:-------:|
+| `FIGMA_URL` | Figma project identification URI | `string` |
+| `FIGMA_TOKEN` | Figma development API authorization token | `string` |
+| `FIGMA_PAGE` | Name of tokens page on Figma | `string` |
+
+Off course, ensure your `.env` file isn't versioned (see this in your `.gitignore` file).
+
+---
+
+## Installation
+
+- Clone Figmagic
+- Step into the Figmagic directory, and run `yarn setup` or `npm run setup` to add it globally to your system
+- Step into a project directory, and add or replace **FIGMA_URL** and **FIGMA_TOKEN** in .env with your own file ID and token key (for more on this, [go to Figma's developer docs](https://www.figma.com/developers/docs))
+- Run `figmagic`
+- You should now have a `/tokens` folder in the root! The `/tokens` folder has what you want
 
 ## Figma setup
 
 Your structure needs to correspond to the following:
 
--   A Page needs to exist, called "Design tokens". In case you have more than one page, put "Design tokens" as the very first (just in case)
--   Further, inside the "Design tokens" page, frames need to be exist. Name them "Colors", "Font sizes", "Font families", "Font weights", "Line heights", and "Spacing" – exact casing is not important, however the **spelling is important!**
--   All items on a page need to be contained within one or more frames
+- A Page needs to exist, called "Design Tokens" (or set the name in the `.figmagic.json` or `.env` environment variable `FIGMA_PAGE`).
+- Further, inside the "Design Tokens" page, frames need to be exist. Is the same names inside the `tokens` collection in `.figmagic.json`.
+- All items on a page must to contained in one or more frames
 
-See a demo/template at [https://www.figma.com/file/UkrKTnjjKB0lJKYAifn9YWXU/Figmagic---Design-Token-Example-v1.0](https://www.figma.com/file/UkrKTnjjKB0lJKYAifn9YWXU/Figmagic---Design-Token-Example-v1.0). Feel free to simply copy it and paste it into your own document.
+See a demo/template at [Figma example project]. Feel free to copy it and paste it into your own document.
 
-**Note:** Refer to the the document structure in the image below and in the template linked above.
+**Note:** Refer to the document structure in the image below and in the template linked above.
 
 ![Figma Document Structure](project-structure.png)
+
+---
 
 ## Figma styles
 
@@ -64,48 +87,37 @@ Figma styles became publicly available in June 2018 and are incredibly valuable 
 
 ### Unidimensional or multidimensional values
 
-A Figma style is multidimensional: It contains any number of properties wrapped into one style, acting as kind of a package. This is extremely handy in a design environment and is very practical from a user standpoint. The user doesn't have to think too hard about storing "redundant" values that are the same in another component, such as N number of units for line height: They are all taken care of.
+A Figma style is multidimensional: It contains any number of properties wrapped into one style, acting as kind of a package. This is handy in a design environment and is practical from a user standpoint. The user doesn't have to think too hard about storing "redundant" values that are the same in another component, such as N number of units for line height: They are all taken care of.
 
-Figmagic instead expresses tokens as instances of every individual value, thus being unidimensional – storing only one value per item. Examples could be sets of line heights, font weights, or font sizes, each one individually specified. This means that values can be used and mixed as pleased in any number of contexts, not becoming bound to one specific context such as a certain kind of heading. This is good for a developer because we would rather just map out the definitive values for something, onto a component (a "context" so to speak).
+Figmagic instead expresses tokens as instances of every individual value, thus being unidimensional – storing one value per item. Examples could be sets of line heights, font weights, or font sizes, each one individually specified. This means that values can used and mixed as pleased in any number of contexts, not becoming bound to one specific context such as a certain kind of heading. This is good for a developer because we would rather map out the definitive values for something, onto a component (a "context" so to speak).
 
-Because of this difference, the appropriate way to structure a Figmagic-compatible Figma design document is to display one or more items/tokens in the respective frames that correspond to the accepted token types (line height, font size...) where each item has only one key property that's changed in-between them (such as one text using size 48, the next using size 40...), since those items are what Figmagic loops through when creating your code tokens.
+Because of this difference, the appropriate way to structure a Figmagic-compatible Figma design document is to display one or more items/tokens in the respective frames that correspond to the accepted token types (line height, font size...) where each item has one key property that's changed in-between them (such as one text using size 48, the next using size 40...), since those items are what Figmagic loops through when creating your code tokens.
 
-### OK, but should I use Figma styles (also) when using Figmagic?
+### Q: OK, but should I use Figma styles (also) when using Figmagic
 
-Whatever suits you! As long as you remember that what Figmagic fetches are those single (unidimensional) values from each design item/token it should all work. Figma styles may help you to work though, and is probably just a good thing for any regular normal design work. Again though, Figmagic does not use those values.
+A: Whatever suits you! As long as you remember that what Figmagic fetches are those single (unidimensional) values from each design item/token it should all work. Figma styles may help you to work though, and is probably a good thing for any regular normal design work. Again though, Figmagic does not use those values.
 
-## Token formatting/conversion
-
-### Font families
-
-Postscript name (eg. FiraSans-Regular).
-
-### Font weights
-
-**Work in progress**.
-
-### Font sizes
-
-Rem units based on global font size (base 16px, change this within Figmagic also, if you've altered this value in your CSS).
-
-### Line heights
-
-Unitless.
-
-### Colors
-
-RGBA colors.
-
-### Spacing
-
-Em units.
+---
 
 ## Structure
 
--   `bin` contains the project's MJS/JS files; `bin/functions` contains most of the functions
--   `figma` will contain the extracted Figma JSON and various build-time JSON files
--   `tokens` will contain the token files (in format)
+- `dist` contains the projects CJS file builded with the help of `Rollup`;
+- `src` contains the source code (with `TypeScript`);
 
-## Want to add or rethink something in Figmagic?
+---
 
-You are very welcome to contribute to the project! Pull requests welcome, as well as issues or plain messages.
+## Q: Want to add or rethink something in Figmagic
+
+A: You are welcome to contribute to the project! Pull requests welcome, as well as issues or plain messages.
+
+---
+
+## TO DO list
+
+- [ ] Figma JSON as `.json` (today is the same type from `format` option of `.figmagic.json` );
+- [ ] Another outputs formats (as `.sass` or `.scss`, `.less`, `.json` etc);
+- [ ] Another colors formats;
+- [ ] Another css units;
+- [ ] Option to specify the `key` to use as name for the token.
+
+[figma example project]: https://www.figma.com/file/WxG6QtKZKH4WqSRZX5xm8B

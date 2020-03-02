@@ -44,7 +44,7 @@ argv
 			return configFile;
 		},
 		default: false,
-		describe: "Extend and modify the default config file: .figmagic.json"
+		describe: "Extend the default config file: .figmagic.json"
 	})
 	.option("figma-url", {
 		alias: "u",
