@@ -82,7 +82,13 @@ describe("It should succeed to write files", () => {
 			);
 
 		expect(() => {
-			writeFile({}, "lorem", "ipsum");
+			writeFile(
+				{
+					lorem: "ipsum"
+				},
+				"lorem",
+				"ipsum"
+			);
 		}).not.toThrow();
 	});
 });

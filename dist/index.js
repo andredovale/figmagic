@@ -1563,15 +1563,24 @@ var writeFile = function(file, path, name, isToken) {
 	write(file, path, name, isToken);
 };
 var writeDeclarations = function(file, name, filePath) {
+	var declarations = {};
+	Object.keys(file).forEach(function(key) {
+		declarations[key] = typeof file[key];
+	});
+	var content =
+		"export default " +
+		stringParser(name, "camel") +
+		";\n\ndeclare const " +
+		stringParser(name, "camel") +
+		": " +
+		JSON.stringify(declarations, null, "	")
+			.replace(/: "/g, ": ")
+			.replace(/",/g, ";")
+			.replace(/"\n}/g, ";\n}") +
+		";\n";
 	fs.writeFile(
 		filePath.replace("." + format$1, ".d.ts"),
-		"export default " +
-			stringParser(name, "camel") +
-			";\n\ndeclare const " +
-			stringParser(name, "camel") +
-			': {\n\t"' +
-			Object.keys(file).join('": string;\n	"') +
-			'": string;\n};\n',
+		content,
 		"utf-8",
 		function(error) {
 			if (error)
