@@ -1,7 +1,8 @@
 import { Config } from "../types/config";
-import { roundToDecimal } from "./round-to-decimal";
 import { Frame } from "../types/frame";
+
 import { stringParser } from "./parse-string";
+import { roundToDecimal } from "./round-to-decimal";
 
 const processToken = (value: any, token: Config["tokens"][0], frame: Frame) => {
 	if (!value && !token.fallback)

@@ -1,5 +1,6 @@
-import { config } from "../config";
 import { Page } from "../types/page";
+import { config } from "../config";
+
 import { stringParser } from "./parse-string";
 
 const { figmaPage } = config;

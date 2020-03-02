@@ -1,19 +1,17 @@
 language: node_js
 
 node_js:
-  - node
+    - node
 
 os:
-  - linux
-  - osx
+    - linux
+    - osx
 
 script:
-  - npm run setup
-  - figmagic
-  - \[ -d figma \]
-  - \[ -f figma/figma.json \]
-  - \[ -d tokens \]
-  - \[ -f tokens/colors.mjs \]
+    - npm run setup
+    - figmagic
+    - \[ -d tokens \]
+    - \[ -f tokens/animation.js \]
 
 notifications:
-  email: false
+    email: false

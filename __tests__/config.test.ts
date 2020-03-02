@@ -66,7 +66,6 @@ describe("It should return config without error", () => {
 	});
 
 	const mock = {
-		format: "js",
 		figmaPage: "lorem",
 		figmaToken: "ipsum",
 		figmaUrl: "dolor"

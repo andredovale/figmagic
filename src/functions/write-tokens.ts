@@ -1,13 +1,15 @@
+import { Json } from "../types/common";
 import { config } from "../config";
+
 import { setupToken } from "./setup-token";
 import { tokensPage } from "./tokens-page";
 import { writeFile } from "./write-file";
 
-const { tokens } = config;
-
-type Json = { err?: string; status?: string; [key: string]: any };
+const { tokens, figmaTokens, outputFigmaTokensPath } = config;
 
 export const writeTokens = (data: Json) => {
+	if (!figmaTokens) return;
+
 	if (!tokens || !tokens.length)
 		throw new Error("Less than one token provided to writeTokens()!");
 
@@ -19,6 +21,6 @@ export const writeTokens = (data: Json) => {
 		);
 
 		if (processedToken)
-			writeFile(processedToken, "tokens", token.name, true);
+			writeFile(processedToken, outputFigmaTokensPath, token.name, true);
 	}
 };

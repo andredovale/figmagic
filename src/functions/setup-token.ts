@@ -1,7 +1,9 @@
 import _get from "lodash/get";
-import { Frame } from "../types/frame";
+
 import { Config } from "../types/config";
+import { Frame } from "../types/frame";
 import { Page } from "../types/page";
+
 import { processToken } from "./process-token";
 import { stringParser } from "./parse-string";
 

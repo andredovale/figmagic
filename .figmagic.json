@@ -8,6 +8,9 @@
 	"figmaTokens": true,
 	"outputColorFormat": "rgba",
 	"outputCSSUnit": "em",
+	"outputFigmaJsonPath": "figma",
+	"outputFigmaJsonName": "figma",
+	"outputFigmaTokensPath": "tokens",
 	"outputNameFormat": "kebab",
 	"tokens": [
 		{
