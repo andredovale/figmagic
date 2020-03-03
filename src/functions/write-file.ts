@@ -19,18 +19,30 @@ const writeFile: WriteFile = (file, path, name, isToken = false) => {
 };
 
 const writeDeclarations = (
-	file: Json | string,
+	file: { [key: string]: any },
 	name: string,
 	filePath: string
 ) => {
+	const declarations: { [key: string]: any } = {};
+	Object.keys(file).forEach(key => {
+		declarations[key] = typeof file[key];
+	});
+
+	const content = `export default ${stringParser(name, "camel")};
+
+declare const ${stringParser(name, "camel")}: ${JSON.stringify(
+		declarations,
+		null,
+		"	"
+	)
+		.replace(/: "/g, ": ")
+		.replace(/",/g, ";")
+		.replace(/"\n}/g, ";\n}")};
+`;
+
 	fs.writeFile(
 		filePath.replace(`.${format}`, ".d.ts"),
-		`export default ${stringParser(
-			name,
-			"camel"
-		)};\n\ndeclare const ${stringParser(name, "camel")}: {\n	"${Object.keys(
-			file
-		).join('": string;\n	"')}": string;\n};\n`,
+		content,
 		"utf-8",
 		error => {
 			if (error)

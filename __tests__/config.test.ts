@@ -101,4 +101,13 @@ describe("It should return config without error", () => {
 
 		expect(config).toMatchObject({ ...mock, figmaPage: "Design tokens" });
 	});
+
+	test("With --output argv", () => {
+		process.argv = [...ARGV, "-o", "teste"];
+		process.env = ENV;
+
+		const { config } = require("../src/config");
+
+		expect(config).toMatchObject(mock);
+	});
 });
