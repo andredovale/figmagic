@@ -66,7 +66,7 @@ const processToken = (value: any, token: Config["tokens"][0], frame: Frame) => {
 					from: "letterSpacing",
 					to: "letter-spacing",
 					processKey: (value: number) =>
-						`${roundToDecimal(value, 4)}rem`
+						`${roundToDecimal(value * 0.1, 4)}em`
 				},
 				{
 					from: "lineHeightPercentFontSize",

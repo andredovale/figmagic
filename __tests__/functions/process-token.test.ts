@@ -184,7 +184,7 @@ describe("It should return the processed token", () => {
 
 		const expected2 = {
 			"font-size": "2.1rem",
-			"letter-spacing": "0.08rem",
+			"letter-spacing": "0.008em",
 			"line-height": 1.38,
 			"text-align": "left"
 		};

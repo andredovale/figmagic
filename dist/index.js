@@ -176,7 +176,7 @@ var figmaToken = "";
 var figmaPage = "Design Tokens";
 var format = "js";
 var apiBaseUrl = "https://api.figma.com/v1/files/";
-var figmaJson = false;
+var figmaJson = true;
 var figmaTokens = true;
 var outputColorFormat = "rgba";
 var outputCSSUnit = "em";
@@ -2705,7 +2705,7 @@ var processToken = function(value, token, frame) {
 					from: "letterSpacing",
 					to: "letter-spacing",
 					processKey: function(value) {
-						return roundToDecimal(value, 4) + "rem";
+						return roundToDecimal(value * 0.1, 4) + "em";
 					}
 				},
 				{
