@@ -2705,7 +2705,7 @@ var processToken = function(value, token, frame) {
 					from: "letterSpacing",
 					to: "letter-spacing",
 					processKey: function(value) {
-						return roundToDecimal(value, 4) + "rem";
+						return roundToDecimal(value * 0.1, 4) + "em";
 					}
 				},
 				{
