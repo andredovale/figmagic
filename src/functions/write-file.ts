@@ -68,7 +68,7 @@ const write = (
 			file,
 			null,
 			"	"
-		)}\n\nexport default ${camelCaseName};`;
+		)};\n\nexport default ${camelCaseName};\n`;
 	}
 	filePath += `.${format}`;
 
