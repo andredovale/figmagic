@@ -10,7 +10,7 @@
 		"salesforce theo"
 	],
 	"homepage": "https://www.figmagic.com",
-	"version": "1.0.47",
+	"version": "1.0.48",
 	"author": "Mikael Vesavuori",
 	"main": "dist/index.js",
 	"license": "MIT",
@@ -26,7 +26,7 @@
 		"jest": "^25.1.0",
 		"prettier": "^1.16.4",
 		"pretty-quick": "^2.0.1",
-		"rollup": "^2.0.2",
+		"rollup": "^1.32.1",
 		"rollup-plugin-typescript2": "^0.26.0",
 		"ts-jest": "^25.1.0",
 		"typescript": "^3.7.5"
