@@ -168,7 +168,7 @@ describe("It should return the processed token", () => {
 	});
 
 	test("With 'token.processValue' has font", () => {
-		const expected = { "font-family": "lorem", "font-weight": 300 };
+		const expected = { "font-family": "lorem", "font-weight": "300" };
 		expect(
 			processToken(
 				{ fontFamily: "lorem", fontWeight: 300 },
@@ -185,7 +185,7 @@ describe("It should return the processed token", () => {
 		const expected2 = {
 			"font-size": "2.1rem",
 			"letter-spacing": "0.008em",
-			"line-height": 1.38,
+			"line-height": "1.38",
 			"text-align": "left"
 		};
 		expect(

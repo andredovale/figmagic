@@ -2712,7 +2712,7 @@ var processToken = function(value, token, frame) {
 					from: "lineHeightPercentFontSize",
 					to: "line-height",
 					processKey: function(value) {
-						return roundToDecimal(value / 100, 4);
+						return String(roundToDecimal(value / 100, 4));
 					}
 				},
 				{
@@ -2726,7 +2726,7 @@ var processToken = function(value, token, frame) {
 			for (var _a = 0, keys_1 = keys; _a < keys_1.length; _a++) {
 				var key = keys_1[_a];
 				if (fontValue[key]) {
-					font[stringParser(key, "kebab")] = fontValue[key];
+					font[stringParser(key, "kebab")] = String(fontValue[key]);
 				}
 			}
 			if (fontValue.fontPostScriptName) {
