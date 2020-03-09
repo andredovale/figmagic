@@ -72,7 +72,7 @@ const processToken = (value: any, token: Config["tokens"][0], frame: Frame) => {
 					from: "lineHeightPercentFontSize",
 					to: "line-height",
 					processKey: (value: number) =>
-						roundToDecimal(value / 100, 4)
+						String(roundToDecimal(value / 100, 4))
 				},
 				{
 					from: "textAlignHorizontal",
@@ -83,7 +83,7 @@ const processToken = (value: any, token: Config["tokens"][0], frame: Frame) => {
 
 			for (const key of keys) {
 				if (fontValue[key]) {
-					font[stringParser(key, "kebab")] = fontValue[key];
+					font[stringParser(key, "kebab")] = String(fontValue[key]);
 				}
 			}
 
