@@ -176,7 +176,7 @@ var figmaToken = "";
 var figmaPage = "Design Tokens";
 var format = "js";
 var apiBaseUrl = "https://api.figma.com/v1/files/";
-var figmaJson = false;
+var figmaJson = true;
 var figmaTokens = true;
 var outputColorFormat = "rgba";
 var outputCSSUnit = "em";
@@ -235,7 +235,7 @@ var tokens = [
 	{
 		frameName: "shadows",
 		name: "shadow",
-		path: "effects[0]",
+		path: "effects",
 		style: true,
 		styleKey: "effect",
 		processValue: "shadow"
@@ -2808,31 +2808,39 @@ var processToken = function(value, token, frame) {
 			break;
 		case "shadow":
 			var shadowValue = value;
-			if (typeof shadowValue !== "object")
+			if (!Array.isArray(shadowValue))
 				throw new Error(
 					"The processValue " +
 						token.processValue +
-						" need an object has value"
+						" need an array has value"
 				);
-			var shadowOffsetX = shadowValue.offset.x + "px ";
-			var shadowOffsetY = shadowValue.offset.y + "px ";
-			var shadowRadius = shadowValue.radius + "px ";
-			var shadowColorR = Math.round(shadowValue.color.r * 255);
-			var shadowColorG = Math.round(shadowValue.color.g * 255);
-			var shadowColorB = Math.round(shadowValue.color.b * 255);
-			var shadowColorA = roundToDecimal(shadowValue.color.a * 1, 3);
-			var shadowColor =
-				"rgba(" +
-				shadowColorR +
-				", " +
-				shadowColorG +
-				", " +
-				shadowColorB +
-				", " +
-				shadowColorA +
-				")";
-			processedToken =
-				shadowOffsetX + shadowOffsetY + shadowRadius + shadowColor;
+			processedToken = "";
+			shadowValue.forEach(function(shadow, index) {
+				var shadowOffsetX = shadow.offset.x + "px ";
+				var shadowOffsetY = shadow.offset.y + "px ";
+				var shadowRadius = shadow.radius + "px ";
+				var shadowColorR = Math.round(shadow.color.r * 255);
+				var shadowColorG = Math.round(shadow.color.g * 255);
+				var shadowColorB = Math.round(shadow.color.b * 255);
+				var shadowColorA = roundToDecimal(shadow.color.a * 1, 3);
+				var shadowColor =
+					"rgba(" +
+					shadowColorR +
+					", " +
+					shadowColorG +
+					", " +
+					shadowColorB +
+					", " +
+					shadowColorA +
+					")";
+				processedToken =
+					processedToken +
+					(!!index ? ", " : "") +
+					shadowOffsetX +
+					shadowOffsetY +
+					shadowRadius +
+					shadowColor;
+			});
 			break;
 		default:
 			processedToken = "";
