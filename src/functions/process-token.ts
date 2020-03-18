@@ -8,7 +8,7 @@ const processToken = (value: any, token: Config["tokens"][0], frame: Frame) => {
 	if (!value && !token.fallback)
 		throw new Error("Value or Fallback don't provided to processToken()!");
 
-	let processedToken;
+	let processedToken: string | { [key: string]: number | string };
 
 	if (!value && token.fallback) {
 		processedToken = `${token.prefix || ""}${
@@ -41,7 +41,7 @@ const processToken = (value: any, token: Config["tokens"][0], frame: Frame) => {
 			const colorB = Math.round(colorValue.b * 255);
 			const colorA = roundToDecimal(colorValue.a * 1, 3);
 
-			processedToken = `rgba(${colorR}, ${colorG}, ${colorB}, ${colorA})`;
+			processedToken = `rgba(${colorR},${colorG},${colorB},${colorA})`;
 			break;
 
 		case "font":
@@ -172,22 +172,32 @@ const processToken = (value: any, token: Config["tokens"][0], frame: Frame) => {
 		case "shadow":
 			const shadowValue: Frame["effects"][0] = value;
 
-			if (typeof shadowValue !== "object")
+			if (!Array.isArray(shadowValue))
 				throw new Error(
-					`The processValue ${token.processValue} need an object has value`
+					`The processValue ${token.processValue} need an array has value`
 				);
 
-			const shadowOffsetX = shadowValue.offset.x + "px ";
-			const shadowOffsetY = shadowValue.offset.y + "px ";
-			const shadowRadius = shadowValue.radius + "px ";
-			const shadowColorR = Math.round(shadowValue.color.r * 255);
-			const shadowColorG = Math.round(shadowValue.color.g * 255);
-			const shadowColorB = Math.round(shadowValue.color.b * 255);
-			const shadowColorA = roundToDecimal(shadowValue.color.a * 1, 3);
-			const shadowColor = `rgba(${shadowColorR}, ${shadowColorG}, ${shadowColorB}, ${shadowColorA})`;
+			processedToken = "";
 
-			processedToken =
-				shadowOffsetX + shadowOffsetY + shadowRadius + shadowColor;
+			shadowValue.forEach((shadow, index) => {
+				const shadowOffsetX = shadow.offset.x + "px ";
+				const shadowOffsetY = shadow.offset.y + "px ";
+				const shadowRadius = shadow.radius + "px ";
+				const shadowColorR = Math.round(shadow.color.r * 255);
+				const shadowColorG = Math.round(shadow.color.g * 255);
+				const shadowColorB = Math.round(shadow.color.b * 255);
+				const shadowColorA = roundToDecimal(shadow.color.a * 1, 3);
+				const shadowColor = `rgba(${shadowColorR},${shadowColorG},${shadowColorB},${shadowColorA})`;
+
+				processedToken =
+					processedToken +
+					(!!index ? `, ` : "") +
+					shadowOffsetX +
+					shadowOffsetY +
+					shadowRadius +
+					shadowColor;
+			});
+
 			break;
 
 		default:

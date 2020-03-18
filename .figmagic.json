@@ -63,7 +63,7 @@
 		{
 			"frameName": "shadows",
 			"name": "shadow",
-			"path": "effects[0]",
+			"path": "effects",
 			"style": true,
 			"styleKey": "effect",
 			"processValue": "shadow"

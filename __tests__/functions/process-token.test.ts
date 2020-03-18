@@ -106,7 +106,7 @@ describe("It should throw an error", () => {
 		}).toThrow();
 	});
 
-	test("With 'token.processValue' has 'shadow', but 'value' isn't a object", () => {
+	test("With 'token.processValue' has 'shadow', but 'value' isn't a array", () => {
 		expect(() => {
 			processToken(
 				true,
@@ -164,7 +164,7 @@ describe("It should return the processed token", () => {
 				},
 				{} as Frame
 			)
-		).toBe("rgba(255, 0, 0, 0)");
+		).toBe("rgba(255,0,0,0)");
 	});
 
 	test("With 'token.processValue' has font", () => {
@@ -330,17 +330,19 @@ describe("It should return the processed token", () => {
 	});
 
 	test("With 'token.processValue' has 'shadow'", () => {
-		const expected = "1px 2px 3px rgba(255, 0, 0, 0)";
+		const expected = "1px 2px 3px rgba(255,0,0,0)";
 		expect(
 			processToken(
-				{
-					offset: {
-						x: 1,
-						y: 2
-					},
-					radius: 3,
-					color: { r: 1, g: 0, b: 0, a: 0 }
-				},
+				[
+					{
+						offset: {
+							x: 1,
+							y: 2
+						},
+						radius: 3,
+						color: { r: 1, g: 0, b: 0, a: 0 }
+					}
+				],
 				{
 					frameName: "lorem",
 					name: "ipsum",
