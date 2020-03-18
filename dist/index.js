@@ -176,7 +176,7 @@ var figmaToken = "";
 var figmaPage = "Design Tokens";
 var format = "js";
 var apiBaseUrl = "https://api.figma.com/v1/files/";
-var figmaJson = true;
+var figmaJson = false;
 var figmaTokens = true;
 var outputColorFormat = "rgba";
 var outputCSSUnit = "em";
@@ -2675,11 +2675,11 @@ var processToken = function(value, token, frame) {
 			processedToken =
 				"rgba(" +
 				colorR +
-				", " +
+				"," +
 				colorG +
-				", " +
+				"," +
 				colorB +
-				", " +
+				"," +
 				colorA +
 				")";
 			break;
@@ -2826,11 +2826,11 @@ var processToken = function(value, token, frame) {
 				var shadowColor =
 					"rgba(" +
 					shadowColorR +
-					", " +
+					"," +
 					shadowColorG +
-					", " +
+					"," +
 					shadowColorB +
-					", " +
+					"," +
 					shadowColorA +
 					")";
 				processedToken =
